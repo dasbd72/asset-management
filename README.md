@@ -9,3 +9,8 @@ from multiple exchanges.
 
 - vscode
 - use gofmt to format the code
+
+## References
+
+- [Binance API](https://binance-docs.github.io/apidocs/spot/en/#introduction)
+- [OKX API](https://www.okx.com/docs-v5/en/#overview)
