@@ -16,15 +16,14 @@ import (
 )
 
 type Client struct {
-	APIKey             string
-	APISecret          string
-	APIEndpoint        string
-	FuturesAPIEndpoint string
-	UserAgent          string
-	HTTPClient         *http.Client
-	Logger             *log.Logger
-	TimeOffset         int64
-	Debug              bool
+	apiKey             string
+	apiSecret          string
+	apiEndpoint        string
+	futuresAPIEndpoint string
+	httpClient         *http.Client
+	logger             *log.Logger
+	timeOffset         int64
+	debugging          bool
 }
 
 // Endpoints
@@ -65,19 +64,18 @@ func getFuturesAPIEndpoint() string {
 // Services will be created by the form client.NewXXXService().
 func NewClient(apiKey, apiSecret string) *Client {
 	return &Client{
-		APIKey:             apiKey,
-		APISecret:          apiSecret,
-		APIEndpoint:        getAPIEndpoint(),
-		FuturesAPIEndpoint: getFuturesAPIEndpoint(),
-		UserAgent:          "golang/binance/v1",
-		HTTPClient:         http.DefaultClient,
-		Logger:             log.New(os.Stderr, "Binance", log.LstdFlags),
+		apiKey:             apiKey,
+		apiSecret:          apiSecret,
+		apiEndpoint:        getAPIEndpoint(),
+		futuresAPIEndpoint: getFuturesAPIEndpoint(),
+		httpClient:         http.DefaultClient,
+		logger:             log.New(os.Stderr, "Binance", log.LstdFlags),
 	}
 }
 
 func (c *Client) debug(format string, v ...interface{}) {
-	if c.Debug {
-		c.Logger.Printf(format, v...)
+	if c.debugging {
+		c.logger.Printf(format, v...)
 	}
 }
 
@@ -87,15 +85,15 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 		opt(r)
 	}
 
-	fullURL := fmt.Sprintf("%s%s", c.APIEndpoint, r.endpoint)
+	fullURL := fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
 	if strings.HasPrefix(r.endpoint, "/fapi") {
-		fullURL = fmt.Sprintf("%s%s", c.FuturesAPIEndpoint, r.endpoint)
+		fullURL = fmt.Sprintf("%s%s", c.futuresAPIEndpoint, r.endpoint)
 	}
 	if r.recvWindow > 0 {
 		r.SetParam(recvWindowKey, r.recvWindow)
 	}
 	if r.secType == SecTypeSigned {
-		r.SetParam(timestampKey, currentTimestamp()-c.TimeOffset)
+		r.SetParam(timestampKey, currentTimestamp()-c.timeOffset)
 	}
 	queryString := r.query.Encode()
 	body := &bytes.Buffer{}
@@ -109,12 +107,12 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 		body = bytes.NewBufferString(bodyString)
 	}
 	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
-		header.Set(apiKeyHeader, c.APIKey)
+		header.Set(apiKeyHeader, c.apiKey)
 	}
 
 	if r.secType == SecTypeSigned {
 		raw := fmt.Sprintf("%s%s", queryString, bodyString)
-		mac := hmac.New(sha256.New, []byte(c.APISecret))
+		mac := hmac.New(sha256.New, []byte(c.apiSecret))
 		_, err = mac.Write([]byte(raw))
 		if err != nil {
 			return err
@@ -150,7 +148,7 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 	req = req.WithContext(ctx)
 	req.Header = r.header
 	c.debug("request: %#v", req)
-	res, err := c.HTTPClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}
