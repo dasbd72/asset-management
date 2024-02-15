@@ -86,37 +86,33 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 	for _, opt := range opts {
 		opt(r)
 	}
-	err = r.validate()
-	if err != nil {
-		return err
-	}
 
-	fullURL := fmt.Sprintf("%s%s", c.APIEndpoint, r.Endpoint)
-	if strings.HasPrefix(r.Endpoint, "/fapi") {
-		fullURL = fmt.Sprintf("%s%s", c.FuturesAPIEndpoint, r.Endpoint)
+	fullURL := fmt.Sprintf("%s%s", c.APIEndpoint, r.endpoint)
+	if strings.HasPrefix(r.endpoint, "/fapi") {
+		fullURL = fmt.Sprintf("%s%s", c.FuturesAPIEndpoint, r.endpoint)
 	}
-	if r.RecvWindow > 0 {
-		r.SetParam(recvWindowKey, r.RecvWindow)
+	if r.recvWindow > 0 {
+		r.SetParam(recvWindowKey, r.recvWindow)
 	}
-	if r.SecType == SecTypeSigned {
+	if r.secType == SecTypeSigned {
 		r.SetParam(timestampKey, currentTimestamp()-c.TimeOffset)
 	}
-	queryString := r.Query.Encode()
+	queryString := r.query.Encode()
 	body := &bytes.Buffer{}
-	bodyString := r.Form.Encode()
+	bodyString := r.form.Encode()
 	header := http.Header{}
-	if r.Header != nil {
-		header = r.Header.Clone()
+	if r.header != nil {
+		header = r.header.Clone()
 	}
 	if bodyString != "" {
 		header.Set("Content-Type", "application/x-www-form-urlencoded")
 		body = bytes.NewBufferString(bodyString)
 	}
-	if r.SecType == SecTypeAPIKey || r.SecType == SecTypeSigned {
+	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
 		header.Set(apiKeyHeader, c.APIKey)
 	}
 
-	if r.SecType == SecTypeSigned {
+	if r.secType == SecTypeSigned {
 		raw := fmt.Sprintf("%s%s", queryString, bodyString)
 		mac := hmac.New(sha256.New, []byte(c.APISecret))
 		_, err = mac.Write([]byte(raw))
@@ -136,9 +132,9 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 	}
 	c.debug("full url: %s, body: %s", fullURL, bodyString)
 
-	r.FullURL = fullURL
-	r.Header = header
-	r.Body = body
+	r.fullURL = fullURL
+	r.header = header
+	r.body = body
 	return nil
 }
 
@@ -147,12 +143,12 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 	if err != nil {
 		return []byte{}, err
 	}
-	req, err := http.NewRequest(r.Method, r.FullURL, r.Body)
+	req, err := http.NewRequest(r.method, r.fullURL, r.body)
 	if err != nil {
 		return []byte{}, err
 	}
 	req = req.WithContext(ctx)
-	req.Header = r.Header
+	req.Header = r.header
 	c.debug("request: %#v", req)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {

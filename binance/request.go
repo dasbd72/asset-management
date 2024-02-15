@@ -22,42 +22,56 @@ const (
 
 type Params map[string]interface{}
 
-// Request define an API request
+// Request define an API request, build with Request_builder
 type Request struct {
-	Method     string
-	Endpoint   string
-	Query      url.Values
-	Form       url.Values
-	RecvWindow int64
-	SecType    SecType
-	Header     http.Header
-	Body       io.Reader
-	FullURL    string
+	method     string
+	endpoint   string
+	query      url.Values
+	form       url.Values
+	recvWindow int64
+	secType    SecType
+	header     http.Header
+	body       io.Reader
+	fullURL    string
+}
+
+// Request_builder define a builder for Request
+type Request_builder struct {
+	Method   string
+	Endpoint string
+	SecType  SecType
+}
+
+// Build create a new Request
+func (b Request_builder) Build() *Request {
+	return &Request{
+		method:     b.Method,
+		endpoint:   b.Endpoint,
+		query:      url.Values{},
+		form:       url.Values{},
+		recvWindow: 0,
+		secType:    b.SecType,
+		header:     http.Header{},
+		body:       nil,
+		fullURL:    "",
+	}
 }
 
 // AddParam add param with key/value to query string
 func (r *Request) AddParam(key string, value interface{}) *Request {
-	if r.Query == nil {
-		r.Query = url.Values{}
-	}
-	r.Query.Add(key, fmt.Sprintf("%v", value))
+	r.query.Add(key, fmt.Sprintf("%v", value))
 	return r
 }
 
 // SetParam set param with key/value to query string
 func (r *Request) SetParam(key string, value interface{}) *Request {
-	if r.Query == nil {
-		r.Query = url.Values{}
-	}
-
 	if reflect.TypeOf(value).Kind() == reflect.Slice {
 		v, err := json.Marshal(value)
 		if err == nil {
 			value = string(v)
 		}
 	}
-
-	r.Query.Set(key, fmt.Sprintf("%v", value))
+	r.query.Set(key, fmt.Sprintf("%v", value))
 	return r
 }
 
@@ -71,10 +85,7 @@ func (r *Request) SetParams(m Params) *Request {
 
 // SetFormParam set param with key/value to request form body
 func (r *Request) SetFormParam(key string, value interface{}) *Request {
-	if r.Form == nil {
-		r.Form = url.Values{}
-	}
-	r.Form.Set(key, fmt.Sprintf("%v", value))
+	r.form.Set(key, fmt.Sprintf("%v", value))
 	return r
 }
 
@@ -86,36 +97,23 @@ func (r *Request) SetFormParams(m Params) *Request {
 	return r
 }
 
-func (r *Request) validate() (err error) {
-	if r.Query == nil {
-		r.Query = url.Values{}
-	}
-	if r.Form == nil {
-		r.Form = url.Values{}
-	}
-	return nil
-}
-
 // RequestOption define option type for request
 type RequestOption func(*Request)
 
 // WithRecvWindow set recvWindow param for the request
 func WithRecvWindow(recvWindow int64) RequestOption {
 	return func(r *Request) {
-		r.RecvWindow = recvWindow
+		r.recvWindow = recvWindow
 	}
 }
 
 // WithHeader set or add a header value to the request
 func WithHeader(key, value string, replace bool) RequestOption {
 	return func(r *Request) {
-		if r.Header == nil {
-			r.Header = http.Header{}
-		}
 		if replace {
-			r.Header.Set(key, value)
+			r.header.Set(key, value)
 		} else {
-			r.Header.Add(key, value)
+			r.header.Add(key, value)
 		}
 	}
 }
@@ -123,6 +121,6 @@ func WithHeader(key, value string, replace bool) RequestOption {
 // WithHeaders set or replace the headers of the request
 func WithHeaders(header http.Header) RequestOption {
 	return func(r *Request) {
-		r.Header = header.Clone()
+		r.header = header.Clone()
 	}
 }
