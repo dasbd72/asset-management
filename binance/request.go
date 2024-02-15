@@ -9,18 +9,18 @@ import (
 	"reflect"
 )
 
-type secType int
+type SecType int
 
 const (
 	// SecTypeNone defines no security type
-	SecTypeNone secType = iota
+	SecTypeNone SecType = iota
 	// SecTypeAPIKey defines API key is required
 	SecTypeAPIKey
 	// SecTypeSigned defines both API key and signature is required
 	SecTypeSigned // if the 'timestamp' parameter is required
 )
 
-type params map[string]interface{}
+type Params map[string]interface{}
 
 // Request define an API request
 type Request struct {
@@ -29,7 +29,7 @@ type Request struct {
 	Query      url.Values
 	Form       url.Values
 	RecvWindow int64
-	SecType    secType
+	SecType    SecType
 	Header     http.Header
 	Body       io.Reader
 	FullURL    string
@@ -61,8 +61,8 @@ func (r *Request) SetParam(key string, value interface{}) *Request {
 	return r
 }
 
-// SetParams set params with key/values to query string
-func (r *Request) SetParams(m params) *Request {
+// SetParams set Params with key/values to query string
+func (r *Request) SetParams(m Params) *Request {
 	for k, v := range m {
 		r.SetParam(k, v)
 	}
@@ -78,8 +78,8 @@ func (r *Request) SetFormParam(key string, value interface{}) *Request {
 	return r
 }
 
-// SetFormParams set params with key/values to request form body
-func (r *Request) SetFormParams(m params) *Request {
+// SetFormParams set Params with key/values to request form body
+func (r *Request) SetFormParams(m Params) *Request {
 	for k, v := range m {
 		r.SetFormParam(k, v)
 	}
