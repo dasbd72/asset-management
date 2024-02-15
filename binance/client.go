@@ -22,7 +22,6 @@ type Client struct {
 	futuresAPIEndpoint string
 	httpClient         *http.Client
 	logger             *log.Logger
-	timeOffset         int64
 	debugging          bool
 }
 
@@ -93,7 +92,7 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 		r.SetParam(recvWindowKey, r.recvWindow)
 	}
 	if r.secType == SecTypeSigned {
-		r.SetParam(timestampKey, currentTimestamp()-c.timeOffset)
+		r.SetParam(timestampKey, currentTimestamp())
 	}
 	queryString := r.query.Encode()
 	body := &bytes.Buffer{}
