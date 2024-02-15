@@ -12,23 +12,27 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 type Client struct {
-	APIKey      string
-	APISecret   string
-	APIEndpoint string
-	UserAgent   string
-	HTTPClient  *http.Client
-	Logger      *log.Logger
-	TimeOffset  int64
-	Debug       bool
+	APIKey             string
+	APISecret          string
+	APIEndpoint        string
+	FuturesAPIEndpoint string
+	UserAgent          string
+	HTTPClient         *http.Client
+	Logger             *log.Logger
+	TimeOffset         int64
+	Debug              bool
 }
 
 // Endpoints
 const (
-	baseAPIMainURL    = "https://api.binance.com"
-	baseAPITestnetURL = "https://testnet.binance.vision"
+	baseAPIMainURL       = "https://api.binance.com"
+	baseAPITestnetURL    = "https://testnet.binance.vision"
+	futuresAPIMainURL    = "https://fapi.binance.com"
+	futuresAPITestnetURL = "https://testnet.binancefuture.com"
 
 	timestampKey  = "timestamp"
 	signatureKey  = "signature"
@@ -48,17 +52,26 @@ func getAPIEndpoint() string {
 	return baseAPIMainURL
 }
 
+// getFuturesAPIEndpoint return the base endpoint of the Futures Rest API according the UseTestnet flag
+func getFuturesAPIEndpoint() string {
+	if UseTestnet {
+		return futuresAPITestnetURL
+	}
+	return futuresAPIMainURL
+}
+
 // NewClient initialize an API client instance with API key and secret key.
 // You should always call this function before using this SDK.
 // Services will be created by the form client.NewXXXService().
 func NewClient(apiKey, apiSecret string) *Client {
 	return &Client{
-		APIKey:      apiKey,
-		APISecret:   apiSecret,
-		APIEndpoint: getAPIEndpoint(),
-		UserAgent:   "golang/binance/v1",
-		HTTPClient:  http.DefaultClient,
-		Logger:      log.New(os.Stderr, "Binance", log.LstdFlags),
+		APIKey:             apiKey,
+		APISecret:          apiSecret,
+		APIEndpoint:        getAPIEndpoint(),
+		FuturesAPIEndpoint: getFuturesAPIEndpoint(),
+		UserAgent:          "golang/binance/v1",
+		HTTPClient:         http.DefaultClient,
+		Logger:             log.New(os.Stderr, "Binance", log.LstdFlags),
 	}
 }
 
@@ -79,6 +92,9 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 	}
 
 	fullURL := fmt.Sprintf("%s%s", c.APIEndpoint, r.Endpoint)
+	if strings.HasPrefix(r.Endpoint, "/fapi") {
+		fullURL = fmt.Sprintf("%s%s", c.FuturesAPIEndpoint, r.Endpoint)
+	}
 	if r.RecvWindow > 0 {
 		r.SetParam(recvWindowKey, r.RecvWindow)
 	}
