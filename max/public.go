@@ -31,6 +31,10 @@ func GetUsdtToTWD() (float64, error) {
 	return ticker.Last.Float64(), nil
 }
 
+func (c *Client) GetTicker(symbol string) (*Ticker, error) {
+	return GetTicker(symbol)
+}
+
 func GetTicker(symbol string) (*Ticker, error) {
 	res, err := http.Get(baseAPImainURL + "/api/v2/tickers/" + symbol)
 	if err != nil {
@@ -43,6 +47,10 @@ func GetTicker(symbol string) (*Ticker, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+func (c *Client) GetTickers() (*Tickers, error) {
+	return GetTickers()
 }
 
 func GetTickers() (*Tickers, error) {
