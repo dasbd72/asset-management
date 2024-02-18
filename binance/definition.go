@@ -12,6 +12,8 @@ type (
 	JSONTime    time.Time
 )
 
+func (t *JSONFloat64) Float64() float64 { return float64(*t) }
+
 func (t *JSONFloat64) UnmarshalJSON(s []byte) (err error) {
 	r := strings.Replace(string(s), `"`, ``, -1)
 	if r == "" {
@@ -26,6 +28,8 @@ func (t *JSONFloat64) UnmarshalJSON(s []byte) (err error) {
 	return
 }
 
+func (t *JSONInt64) Int64() int64 { return int64(*t) }
+
 func (t *JSONInt64) UnmarshalJSON(s []byte) (err error) {
 	r := strings.Replace(string(s), `"`, ``, -1)
 	if r == "" {
@@ -39,6 +43,8 @@ func (t *JSONInt64) UnmarshalJSON(s []byte) (err error) {
 	*(*int64)(t) = q
 	return
 }
+
+func (t *JSONTime) Time() time.Time { return time.Time(*t) }
 
 func (t *JSONTime) UnmarshalJSON(s []byte) (err error) {
 	r := strings.Replace(string(s), `"`, ``, -1)
