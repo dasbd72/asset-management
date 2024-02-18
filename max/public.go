@@ -23,6 +23,7 @@ type (
 	Tickers map[string]*Ticker
 )
 
+// GetUsdtToTWD returns the exchange rate of USDT to TWD
 func GetUsdtToTWD() (float64, error) {
 	ticker, err := GetTicker("usdttwd")
 	if err != nil {
@@ -31,10 +32,12 @@ func GetUsdtToTWD() (float64, error) {
 	return ticker.Last.Float64(), nil
 }
 
+// GetTicker returns the ticker of the specified symbol
 func (c *Client) GetTicker(symbol string) (*Ticker, error) {
 	return GetTicker(symbol)
 }
 
+// GetTicker returns the ticker of the specified symbol
 func GetTicker(symbol string) (*Ticker, error) {
 	res, err := http.Get(baseAPImainURL + "/api/v2/tickers/" + symbol)
 	if err != nil {
@@ -49,10 +52,12 @@ func GetTicker(symbol string) (*Ticker, error) {
 	return data, nil
 }
 
+// GetTickers returns all tickers
 func (c *Client) GetTickers() (*Tickers, error) {
 	return GetTickers()
 }
 
+// GetTickers returns all tickers
 func GetTickers() (*Tickers, error) {
 	res, err := http.Get(baseAPImainURL + "/api/v2/tickers")
 	if err != nil {
