@@ -14,27 +14,32 @@ type (
 	GetBalanceResponse struct {
 		BasicResponse
 		Balances []*struct {
+			UTime       JSONTime    `json:"uTime"`
 			TotalEq     JSONFloat64 `json:"totalEq"`
-			IsoEq       JSONFloat64 `json:"isoEq"`
+			IsoEq       JSONFloat64 `json:"isoEq,omitempty"`
 			AdjEq       JSONFloat64 `json:"adjEq,omitempty"`
 			OrdFroz     JSONFloat64 `json:"ordFroz,omitempty"`
 			Imr         JSONFloat64 `json:"imr,omitempty"`
 			Mmr         JSONFloat64 `json:"mmr,omitempty"`
+			BorrowFroz  JSONFloat64 `json:"borrowFroz,omitempty"`
 			MgnRatio    JSONFloat64 `json:"mgnRatio,omitempty"`
 			NotionalUsd JSONFloat64 `json:"notionalUsd,omitempty"`
+			Upl         JSONFloat64 `json:"upl,omitempty"`
 			Details     []*struct {
 				Ccy           string      `json:"ccy"`
 				Eq            JSONFloat64 `json:"eq"`
 				CashBal       JSONFloat64 `json:"cashBal"`
+				UTime         JSONTime    `json:"uTime"`
 				IsoEq         JSONFloat64 `json:"isoEq,omitempty"`
 				AvailEq       JSONFloat64 `json:"availEq,omitempty"`
 				DisEq         JSONFloat64 `json:"disEq"`
+				FixedBal      JSONFloat64 `json:"fixedBal,omitempty"`
 				AvailBal      JSONFloat64 `json:"availBal"`
 				FrozenBal     JSONFloat64 `json:"frozenBal"`
-				OrdFrozen     JSONFloat64 `json:"ordFrozen"`
+				OrdFrozen     JSONFloat64 `json:"ordFrozen,omitempty"`
 				Liab          JSONFloat64 `json:"liab,omitempty"`
 				Upl           JSONFloat64 `json:"upl,omitempty"`
-				UplLib        JSONFloat64 `json:"uplLib,omitempty"`
+				UplLiab       JSONFloat64 `json:"uplLiab,omitempty"`
 				CrossLiab     JSONFloat64 `json:"crossLiab,omitempty"`
 				IsoLiab       JSONFloat64 `json:"isoLiab,omitempty"`
 				MgnRatio      JSONFloat64 `json:"mgnRatio,omitempty"`
@@ -42,12 +47,15 @@ type (
 				Twap          JSONFloat64 `json:"twap,omitempty"`
 				MaxLoan       JSONFloat64 `json:"maxLoan,omitempty"`
 				EqUsd         JSONFloat64 `json:"eqUsd"`
+				BorrowFroz    JSONFloat64 `json:"borrowFroz,omitempty"`
 				NotionalLever JSONFloat64 `json:"notionalLever,omitempty"`
 				StgyEq        JSONFloat64 `json:"stgyEq"`
 				IsoUpl        JSONFloat64 `json:"isoUpl,omitempty"`
-				UTime         JSONTime    `json:"uTime"`
+				SpotInUseAmt  JSONFloat64 `json:"spotInUseAmt,omitempty"`
+				SpotIsoBal    JSONFloat64 `json:"spotIsoBal,omitempty"`
+				Imr           JSONFloat64 `json:"imr,omitempty"`
+				Mmr           JSONFloat64 `json:"mmr,omitempty"`
 			} `json:"details,omitempty"`
-			UTime JSONTime `json:"uTime"`
 		} `json:"data,omitempty"`
 	}
 )
