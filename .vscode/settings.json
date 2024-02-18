@@ -9,4 +9,5 @@
     "editor.defaultFormatter": "vscode.json-language-features",
     "editor.formatOnSave": true,
   },
+  "go.testEnvFile": "${workspaceFolder}/.env",
 }
