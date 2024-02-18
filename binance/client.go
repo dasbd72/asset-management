@@ -8,10 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -21,8 +19,6 @@ type Client struct {
 	apiEndpoint        string
 	futuresAPIEndpoint string
 	httpClient         *http.Client
-	logger             *log.Logger
-	debugging          bool
 }
 
 // Endpoints
@@ -68,90 +64,86 @@ func NewClient(apiKey, apiSecret string) *Client {
 		apiEndpoint:        getAPIEndpoint(),
 		futuresAPIEndpoint: getFuturesAPIEndpoint(),
 		httpClient:         http.DefaultClient,
-		logger:             log.New(os.Stderr, "Binance", log.LstdFlags),
 	}
 }
 
-func (c *Client) debug(format string, v ...interface{}) {
-	if c.debugging {
-		c.logger.Printf(format, v...)
-	}
-}
-
-func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
+func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption) (data []byte, err error) {
 	// set request options from user
 	for _, opt := range opts {
 		opt(r)
 	}
 
-	fullURL := fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
+	var (
+		u        string
+		req      *http.Request
+		query    url.Values = url.Values{}
+		body     string
+		queryStr string
+	)
+	// choose the endpoint
 	if strings.HasPrefix(r.endpoint, "/fapi") {
-		fullURL = fmt.Sprintf("%s%s", c.futuresAPIEndpoint, r.endpoint)
+		u = fmt.Sprintf("%s%s", c.futuresAPIEndpoint, r.endpoint)
+	} else {
+		u = fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
 	}
+	// set the parameters
 	if r.recvWindow > 0 {
-		r.SetParam(recvWindowKey, r.recvWindow)
+		r.params[recvWindowKey] = r.recvWindow
 	}
 	if r.secType == SecTypeSigned {
-		r.SetParam(timestampKey, currentTimestamp())
+		r.params[timestampKey] = currentTimestamp()
 	}
-	queryString := r.query.Encode()
-	body := &bytes.Buffer{}
-	bodyString := r.form.Encode()
-	header := http.Header{}
-	if r.header != nil {
-		header = r.header.Clone()
+	if r.method == http.MethodGet {
+		for k, v := range r.params {
+			query.Add(k, fmt.Sprintf("%v", v))
+		}
+	} else {
+		form := url.Values{}
+		for k, v := range r.params {
+			form.Add(k, fmt.Sprintf("%v", v))
+		}
+		body = form.Encode()
 	}
-	if bodyString != "" {
-		header.Set("Content-Type", "application/x-www-form-urlencoded")
-		body = bytes.NewBufferString(bodyString)
+	if len(query) > 0 {
+		queryStr = query.Encode()
 	}
-	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
-		header.Set(apiKeyHeader, c.apiKey)
-	}
-
 	if r.secType == SecTypeSigned {
-		raw := fmt.Sprintf("%s%s", queryString, bodyString)
+		// sign the request
+		raw := fmt.Sprintf("%s%s", queryStr, body)
 		mac := hmac.New(sha256.New, []byte(c.apiSecret))
 		_, err = mac.Write([]byte(raw))
 		if err != nil {
-			return err
+			return []byte{}, err
 		}
 		v := url.Values{}
 		v.Set(signatureKey, fmt.Sprintf("%x", (mac.Sum(nil))))
-		if queryString == "" {
-			queryString = v.Encode()
+		if queryStr == "" {
+			queryStr = v.Encode()
 		} else {
-			queryString = fmt.Sprintf("%s&%s", queryString, v.Encode())
+			queryStr = fmt.Sprintf("%s&%s", queryStr, v.Encode())
 		}
 	}
-	if queryString != "" {
-		fullURL = fmt.Sprintf("%s?%s", fullURL, queryString)
+	if queryStr != "" {
+		// add the query string to the url
+		u = fmt.Sprintf("%s?%s", u, queryStr)
 	}
-	c.debug("full url: %s, body: %s", fullURL, bodyString)
-
-	r.fullURL = fullURL
-	r.header = header
-	r.body = body
-	return nil
-}
-
-func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption) ([]byte, error) {
-	err := c.parseRequest(r, opts...)
-	if err != nil {
-		return []byte{}, err
+	// create the request
+	req, err = http.NewRequest(r.method, u, bytes.NewBuffer([]byte(body)))
+	if body != "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	req, err := http.NewRequest(r.method, r.fullURL, r.body)
-	if err != nil {
-		return []byte{}, err
+	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
+		req.Header.Set(apiKeyHeader, c.apiKey)
 	}
 	req = req.WithContext(ctx)
-	req.Header = r.header
-	c.debug("request: %#v", req)
+
+	// do the request
 	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}
-	data, err := io.ReadAll(res.Body)
+
+	data, err = io.ReadAll(res.Body)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -163,15 +155,15 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 			err = cerr
 		}
 	}()
-	c.debug("response: %#v", res)
-	c.debug("response body: %s", string(data))
-	c.debug("response status code: %d", res.StatusCode)
 
 	if res.StatusCode >= http.StatusBadRequest {
 		apiErr := &APIError{}
 		e := json.Unmarshal(data, apiErr)
 		if e != nil {
-			c.debug("failed to unmarshal json: %s", e)
+			return nil, &APIError{
+				Code:    int64(-1),
+				Message: string(e.Error()),
+			}
 		}
 		return nil, apiErr
 	}

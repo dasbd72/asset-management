@@ -4,7 +4,10 @@ import (
 	"fmt"
 )
 
-// APIError define API error when response status is 4xx or 5xx
+// APIError define API error
+//
+// Refer to https://binance-docs.github.io/apidocs/spot/en/#error-codes
+// for error code details
 type APIError struct {
 	Code    int64  `json:"code"`
 	Message string `json:"msg"`
