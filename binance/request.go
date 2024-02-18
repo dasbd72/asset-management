@@ -30,6 +30,9 @@ type Request_builder struct {
 
 // Build create a new Request
 func (b Request_builder) Build() *Request {
+	if b.Method == "" {
+		b.Method = "GET"
+	}
 	if b.Params == nil {
 		b.Params = map[string]interface{}{}
 	}
