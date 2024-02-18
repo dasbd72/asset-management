@@ -60,4 +60,8 @@ func (t *JSONTime) UnmarshalJSON(s []byte) (err error) {
 	return
 }
 
+func (t *JSONTime) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatInt(time.Time(*t).UnixMilli(), 10)), nil
+}
+
 func (t *JSONTime) String() string { return (time.Time)(*t).String() }

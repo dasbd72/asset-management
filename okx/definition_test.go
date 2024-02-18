@@ -1,6 +1,7 @@
 package okx
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -163,6 +164,18 @@ func TestJSONTime(t *testing.T) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(f.Time(), test.want); diff != "" {
+				t.Errorf("unexpected time (-got +want): %s", diff)
+			}
+			{
+				got, err := f.MarshalJSON()
+				if err != nil {
+					t.Fatal(err)
+				}
+				if diff := cmp.Diff(string(got), strconv.FormatInt(test.want.UnixMilli(), 10)); diff != "" {
+					t.Errorf("unexpected time (-got +want): %s", diff)
+				}
+			}
+			if diff := cmp.Diff(f.String(), test.want.String()); diff != "" {
 				t.Errorf("unexpected time (-got +want): %s", diff)
 			}
 		})
