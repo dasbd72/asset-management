@@ -1,5 +1,7 @@
 package okx
 
+import "net/http"
+
 type SecType int
 
 const (
@@ -34,6 +36,12 @@ type Request_builder struct {
 }
 
 func (b Request_builder) Build() *Request {
+	if b.Method == "" {
+		b.Method = http.MethodGet
+	}
+	if b.Params == nil {
+		b.Params = map[string]interface{}{}
+	}
 	return &Request{
 		method:   b.Method,
 		endpoint: b.Endpoint,
