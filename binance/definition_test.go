@@ -143,6 +143,11 @@ func TestJSONTime(t *testing.T) {
 			in:   "1694061154503",
 			want: time.UnixMilli(1694061154503),
 		},
+		{
+			name:    "invalid",
+			in:      "invalid",
+			wantErr: true,
+		},
 	}
 
 	for _, test := range tests {
