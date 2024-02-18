@@ -5,6 +5,10 @@
 This project is created to programmatically manage my crypto currency assets
 from multiple exchanges.
 
+Supported exchanges
+- binance
+- okx
+
 ## Development Environment
 
 - vscode
