@@ -1,8 +1,9 @@
-go 1.22
+go 1.22.0
 
 use (
 	./binance
 	./cmd/ccy-cli
+	./master
 	./max
 	./okx
 )
