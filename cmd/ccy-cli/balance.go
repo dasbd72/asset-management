@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/dasbd72/asset-management/binance"
-	"github.com/dasbd72/asset-management/master"
+	"github.com/dasbd72/asset-management/manager"
 	"github.com/dasbd72/asset-management/max"
 	"github.com/dasbd72/asset-management/okx"
 	"github.com/spf13/cobra"
@@ -29,7 +29,7 @@ func Balance(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	c := master.NewClient(
+	c := manager.NewClient(
 		binance.NewClient(binanceApiKey, binanceApiSecret),
 		okx.NewClient(okxApiKey, okxApiSecret, okxPassphrase),
 	)

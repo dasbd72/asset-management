@@ -1,4 +1,4 @@
-package master
+package manager
 
 import (
 	"github.com/dasbd72/asset-management/binance"

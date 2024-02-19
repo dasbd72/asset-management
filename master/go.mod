@@ -1,4 +1,4 @@
-module github.com/dasbd72/asset-management/master
+module github.com/dasbd72/asset-management/manager
 
 go 1.22.0
 
