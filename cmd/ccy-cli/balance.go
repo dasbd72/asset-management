@@ -9,20 +9,15 @@ import (
 	"github.com/dasbd72/asset-management/binance"
 	"github.com/dasbd72/asset-management/max"
 	"github.com/dasbd72/asset-management/okx"
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
 func Balance(cmd *cobra.Command, args []string) error {
 	// Load environment variables
 	ctx := context.Background()
-	err := godotenv.Load()
-	if err != nil {
-		return err
-	}
 
 	totalBalance := 0.0
-	err = func() error {
+	err := func() error {
 		apiKey := os.Getenv("BINANCE_API_KEY")
 		apiSecret := os.Getenv("BINANCE_API_SECRET")
 		if apiKey == "" || apiSecret == "" {
