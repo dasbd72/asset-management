@@ -3,7 +3,7 @@ go 1.22.0
 use (
 	./binance
 	./cmd/ccy-cli
-	./master
+	./manager
 	./max
 	./okx
 )
