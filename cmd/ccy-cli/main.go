@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +15,7 @@ var (
 func main() {
 	// Try to load environment variables
 	godotenv.Load()
+	godotenv.Load(path.Join(os.Getenv("HOME"), ".ccyrc"))
 
 	root := &cobra.Command{
 		Use:   "experimental",
