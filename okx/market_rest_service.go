@@ -27,9 +27,7 @@ type (
 	}
 
 	GetTickersRequest struct {
-		InstType   string `json:"instType"`
-		Uly        string `json:"uly,omitempty"`
-		InstFamily string `json:"instFamily,omitempty"`
+		params map[string]interface{}
 	}
 
 	GetTickersResponse struct {
@@ -38,7 +36,7 @@ type (
 	}
 
 	GetTickerRequest struct {
-		InstID string `json:"instId"`
+		params map[string]interface{}
 	}
 
 	GetTickerResponse struct {
@@ -47,20 +45,31 @@ type (
 	}
 )
 
+func NewGetTickersRequest(instType string) *GetTickersRequest {
+	return &GetTickersRequest{
+		params: map[string]interface{}{
+			"instType": instType,
+		},
+	}
+}
+
+func (r *GetTickersRequest) Uly(uly string) *GetTickersRequest {
+	r.params["uly"] = uly
+	return r
+}
+
+func (r *GetTickersRequest) InstFamily(instFamily string) *GetTickersRequest {
+	r.params["instFamily"] = instFamily
+	return r
+}
+
 // GetTickers get tickers of instruments
 func (c *Client) GetTickers(ctx context.Context, req *GetTickersRequest, opts ...RequestOption) (*GetTickersResponse, error) {
-	params := map[string]interface{}{"instType": req.InstType}
-	if req.Uly != "" {
-		params["uly"] = req.Uly
-	}
-	if req.InstFamily != "" {
-		params["instFamily"] = req.InstFamily
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/market/tickers",
 		SecType:  SecTypePublic,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
@@ -73,13 +82,21 @@ func (c *Client) GetTickers(ctx context.Context, req *GetTickersRequest, opts ..
 	return data, nil
 }
 
+func NewGetTickerRequest(instID string) *GetTickerRequest {
+	return &GetTickerRequest{
+		params: map[string]interface{}{
+			"instId": instID,
+		},
+	}
+}
+
 // GetTicker get ticker of instrument
 func (c *Client) GetTicker(ctx context.Context, req *GetTickerRequest, opts ...RequestOption) (*GetTickerResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/market/ticker",
 		SecType:  SecTypePublic,
-		Params:   map[string]interface{}{"instId": req.InstID},
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err

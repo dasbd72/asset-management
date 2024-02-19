@@ -19,9 +19,7 @@ func Binance(cmd *cobra.Command, args []string) {
 	)
 
 	// Start testing
-	data, err := c.GetAveragePrice(ctx, &binance.GetAveragePriceRequest{
-		Symbol: "BTCUSDT",
-	})
+	data, err := c.GetOrderBook(ctx, binance.NewGetOrderBookRequest("BTCUSDT"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -8,9 +8,7 @@ import (
 
 type (
 	GetEarnOffersRequest struct {
-		ProductId    string `json:"productId"`
-		ProtocolType string `json:"protocolType"`
-		Ccy          string `json:"ccy"`
+		params map[string]interface{}
 	}
 
 	GetEarnOffersResponse struct {
@@ -38,10 +36,7 @@ type (
 	}
 
 	GetActiveEarnOrdersRequest struct {
-		ProductId    string    `json:"productId"`
-		ProtocolType string    `json:"protocolType"`
-		Ccy          string    `json:"ccy"`
-		State        JSONInt64 `json:"state"`
+		params map[string]interface{}
 	}
 
 	GetActiveEarnOrdersResponse struct {
@@ -71,9 +66,6 @@ type (
 		} `json:"data,omitempty"`
 	}
 
-	GetETHStakingBalanceRequest struct {
-	}
-
 	GetETHStakingBalanceResponse struct {
 		BasicResponse
 		Balances []struct {
@@ -86,7 +78,7 @@ type (
 	}
 
 	GetSavingBalanceRequest struct {
-		Ccy string `json:"ccy,omitempty"`
+		params map[string]interface{}
 	}
 
 	GetSavingBalanceResponse struct {
@@ -103,16 +95,7 @@ type (
 	}
 
 	GetLendingHistoryRequest struct {
-		Ccy string `json:"ccy,omitempty"`
-		// Pagination of data to return records earlier than the requested ts,
-		// Unix timestamp format in milliseconds, e.g. 1597026383085
-		After string `json:"after,omitempty"`
-		// Pagination of data to return records newer than the requested ts,
-		// Unix timestamp format in milliseconds, e.g. 1597026383085
-		Before string `json:"before,omitempty"`
-		// Number of results per request.
-		// The maximum is 100. The default is 100.
-		Limit JSONInt64 `json:"limit,omitempty"`
+		params map[string]interface{}
 	}
 
 	GetLendingHistoryResponse struct {
@@ -127,23 +110,34 @@ type (
 	}
 )
 
+func NewGetEarnOffersRequest() *GetEarnOffersRequest {
+	return &GetEarnOffersRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (r *GetEarnOffersRequest) ProductId(productId string) *GetEarnOffersRequest {
+	r.params["productId"] = productId
+	return r
+}
+
+func (r *GetEarnOffersRequest) ProtocolType(protocolType string) *GetEarnOffersRequest {
+	r.params["protocolType"] = protocolType
+	return r
+}
+
+func (r *GetEarnOffersRequest) Ccy(ccy string) *GetEarnOffersRequest {
+	r.params["ccy"] = ccy
+	return r
+}
+
 // GetEarnOffers get the available earn offers
 func (c *Client) GetEarnOffers(ctx context.Context, req *GetEarnOffersRequest, opts ...RequestOption) (*GetEarnOffersResponse, error) {
-	params := map[string]interface{}{}
-	if req.ProductId != "" {
-		params["productId"] = req.ProductId
-	}
-	if req.ProtocolType != "" {
-		params["protocolType"] = req.ProtocolType
-	}
-	if req.Ccy != "" {
-		params["ccy"] = req.Ccy
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/finance/staking-defi/offers",
 		SecType:  SecTypePrivate,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
@@ -156,26 +150,39 @@ func (c *Client) GetEarnOffers(ctx context.Context, req *GetEarnOffersRequest, o
 	return data, nil
 }
 
+func NewGetActiveEarnOrdersRequest() *GetActiveEarnOrdersRequest {
+	return &GetActiveEarnOrdersRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (r *GetActiveEarnOrdersRequest) ProductId(productId string) *GetActiveEarnOrdersRequest {
+	r.params["productId"] = productId
+	return r
+}
+
+func (r *GetActiveEarnOrdersRequest) ProtocolType(protocolType string) *GetActiveEarnOrdersRequest {
+	r.params["protocolType"] = protocolType
+	return r
+}
+
+func (r *GetActiveEarnOrdersRequest) Ccy(ccy string) *GetActiveEarnOrdersRequest {
+	r.params["ccy"] = ccy
+	return r
+}
+
+func (r *GetActiveEarnOrdersRequest) State(state JSONInt64) *GetActiveEarnOrdersRequest {
+	r.params["state"] = state
+	return r
+}
+
 // GetActiveEarnOrders get the active earn orders
 func (c *Client) GetActiveEarnOrders(ctx context.Context, req *GetActiveEarnOrdersRequest, opts ...RequestOption) (*GetActiveEarnOrdersResponse, error) {
-	params := map[string]interface{}{}
-	if req.ProductId != "" {
-		params["productId"] = req.ProductId
-	}
-	if req.ProtocolType != "" {
-		params["protocolType"] = req.ProtocolType
-	}
-	if req.Ccy != "" {
-		params["ccy"] = req.Ccy
-	}
-	if req.State != 0 {
-		params["state"] = req.State
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/finance/staking-defi/orders-active",
 		SecType:  SecTypePrivate,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
@@ -189,7 +196,7 @@ func (c *Client) GetActiveEarnOrders(ctx context.Context, req *GetActiveEarnOrde
 }
 
 // GetETHStakingBalance get balances in the ETH staking account
-func (c *Client) GetETHStakingBalance(ctx context.Context, req *GetETHStakingBalanceRequest, opts ...RequestOption) (*GetETHStakingBalanceResponse, error) {
+func (c *Client) GetETHStakingBalance(ctx context.Context, opts ...RequestOption) (*GetETHStakingBalanceResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/finance/staking-defi/eth/balance",
@@ -206,17 +213,24 @@ func (c *Client) GetETHStakingBalance(ctx context.Context, req *GetETHStakingBal
 	return data, nil
 }
 
+func NewGetSavingBalanceRequest() *GetSavingBalanceRequest {
+	return &GetSavingBalanceRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (r *GetSavingBalanceRequest) Ccy(ccy string) *GetSavingBalanceRequest {
+	r.params["ccy"] = ccy
+	return r
+}
+
 // GetSavingBalance get balances in the saving account
 func (c *Client) GetSavingBalance(ctx context.Context, req *GetSavingBalanceRequest, opts ...RequestOption) (*GetSavingBalanceResponse, error) {
-	params := map[string]interface{}{}
-	if req.Ccy != "" {
-		params["ccy"] = req.Ccy
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/finance/savings/balance",
 		SecType:  SecTypePrivate,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
@@ -229,26 +243,44 @@ func (c *Client) GetSavingBalance(ctx context.Context, req *GetSavingBalanceRequ
 	return data, nil
 }
 
+func NewGetLendingHistoryRequest() *GetLendingHistoryRequest {
+	return &GetLendingHistoryRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (r *GetLendingHistoryRequest) Ccy(ccy string) *GetLendingHistoryRequest {
+	r.params["ccy"] = ccy
+	return r
+}
+
+// After sets pagination of data to return records earlier than the requested ts,
+// Unix timestamp format in milliseconds, e.g. 1597026383085
+func (r *GetLendingHistoryRequest) After(after int64) *GetLendingHistoryRequest {
+	r.params["after"] = after
+	return r
+}
+
+// Before sets pagination of data to return records newer than the requested ts,
+// Unix timestamp format in milliseconds, e.g. 1597026383085
+func (r *GetLendingHistoryRequest) Before(before int64) *GetLendingHistoryRequest {
+	r.params["before"] = before
+	return r
+}
+
+// Limit sets number of results per request. The maximum is 100. The default is 100.
+func (r *GetLendingHistoryRequest) Limit(limit int64) *GetLendingHistoryRequest {
+	r.params["limit"] = limit
+	return r
+}
+
 // GetLendingHistory get the lending history
 func (c *Client) GetLendingHistory(ctx context.Context, req *GetLendingHistoryRequest, opts ...RequestOption) (*GetLendingHistoryResponse, error) {
-	params := map[string]interface{}{}
-	if req.Ccy != "" {
-		params["ccy"] = req.Ccy
-	}
-	if req.After != "" {
-		params["after"] = req.After
-	}
-	if req.Before != "" {
-		params["before"] = req.Before
-	}
-	if req.Limit != 0 {
-		params["limit"] = req.Limit
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/finance/savings/lending-history",
 		SecType:  SecTypePrivate,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err

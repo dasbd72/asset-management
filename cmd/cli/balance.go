@@ -40,9 +40,7 @@ func Balance(cmd *cobra.Command, args []string) error {
 			sum += w.Balance.Float64()
 		}
 
-		averagePrice, err := c.GetAveragePrice(ctx, &binance.GetAveragePriceRequest{
-			Symbol: "BTCUSDT",
-		})
+		averagePrice, err := c.GetAveragePrice(ctx, binance.NewGetAveragePriceRequest("BTCUSDT"))
 		if err != nil {
 			return err
 		}
@@ -68,30 +66,28 @@ func Balance(cmd *cobra.Command, args []string) error {
 		c := okx.NewClient(apiKey, apiSecret, passphrase)
 
 		sum := 0.0
-		wallet, err := c.GetBalance(ctx, &okx.GetBalanceRequest{})
+		wallet, err := c.GetBalance(ctx, okx.NewGetBalanceRequest())
 		if err != nil {
 			return err
 		}
 		for _, w := range wallet.Balances {
 			sum += w.TotalEq.Float64()
 		}
-		funding, err := c.GetFundingBalances(ctx, &okx.GetFundingBalancesRequest{})
+		funding, err := c.GetFundingBalances(ctx, okx.NewGetFundingBalancesRequest())
 		if err != nil {
 			return err
 		}
 		for _, f := range funding.Balances {
 			sum += f.Bal.Float64()
 		}
-		savings, err := c.GetSavingBalance(ctx, &okx.GetSavingBalanceRequest{})
+		savings, err := c.GetSavingBalance(ctx, okx.NewGetSavingBalanceRequest())
 		if err != nil {
 			return err
 		}
 		for _, s := range savings.Balances {
 			price := 1.0
 			if s.Ccy != "USDT" {
-				ticker, err := c.GetTicker(ctx, &okx.GetTickerRequest{
-					InstID: s.Ccy + "-USDT",
-				})
+				ticker, err := c.GetTicker(ctx, okx.NewGetTickerRequest(s.Ccy+"-USDT"))
 				if err != nil {
 					return err
 				}

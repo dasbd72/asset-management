@@ -30,11 +30,11 @@ func OKX(cmd *cobra.Command, args []string) {
 	// 	InstType: "SPOT",
 	// })
 	// data, err := c.GetFundingBalances(ctx, &okx.GetFundingBalancesRequest{})
-	data, err := c.GetSavingBalance(ctx, &okx.GetSavingBalanceRequest{})
+	// data, err := c.GetSavingBalance(ctx, &okx.GetSavingBalanceRequest{})
 	// data, err := c.GetETHStakingBalance(ctx, &okx.GetETHStakingBalanceRequest{})
 	// data, err := c.GetEarnOffers(ctx, &okx.GetEarnOffersRequest{})
 	// data, err := c.GetActiveEarnOrders(ctx, &okx.GetActiveEarnOrdersRequest{})
-	// data, err := c.GetLendingHistory(ctx, &okx.GetLendingHistoryRequest{})
+	data, err := c.GetLendingHistory(ctx, okx.NewGetLendingHistoryRequest())
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -8,7 +8,7 @@ import (
 
 type (
 	GetBalanceRequest struct {
-		Ccy string `json:"ccy,omitempty"`
+		params map[string]interface{}
 	}
 
 	GetBalanceResponse struct {
@@ -60,17 +60,24 @@ type (
 	}
 )
 
+func NewGetBalanceRequest() *GetBalanceRequest {
+	return &GetBalanceRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (r *GetBalanceRequest) Ccy(ccy string) *GetBalanceRequest {
+	r.params["ccy"] = ccy
+	return r
+}
+
 // GetBalance get account balance
 func (c *Client) GetBalance(ctx context.Context, req *GetBalanceRequest, opts ...RequestOption) (*GetBalanceResponse, error) {
-	params := map[string]interface{}{}
-	if req != nil && req.Ccy != "" {
-		params["ccy"] = req.Ccy
-	}
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v5/account/balance",
 		SecType:  SecTypePrivate,
-		Params:   params,
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err

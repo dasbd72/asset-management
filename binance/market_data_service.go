@@ -43,7 +43,7 @@ type (
 	}
 
 	GetOrderBookRequest struct {
-		Symbol string `json:"symbol"`
+		params map[string]interface{}
 	}
 
 	GetOrderBookResponse struct {
@@ -53,7 +53,7 @@ type (
 	}
 
 	GetAveragePriceRequest struct {
-		Symbol string `json:"symbol"`
+		params map[string]interface{}
 	}
 
 	GetAveragePriceResponse struct {
@@ -114,12 +114,20 @@ func (c *Client) GetExchangeInfo(ctx context.Context, opts ...RequestOption) (*G
 	return data, nil
 }
 
+func NewGetOrderBookRequest(symbol string) *GetOrderBookRequest {
+	return &GetOrderBookRequest{
+		params: map[string]interface{}{
+			"symbol": symbol,
+		},
+	}
+}
+
 func (c *Client) GetOrderBook(ctx context.Context, req *GetOrderBookRequest, opts ...RequestOption) (*GetOrderBookResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/depth",
 		SecType:  SecTypeNone,
-		Params:   map[string]interface{}{"symbol": req.Symbol},
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
@@ -132,12 +140,20 @@ func (c *Client) GetOrderBook(ctx context.Context, req *GetOrderBookRequest, opt
 	return data, nil
 }
 
+func NewGetAveragePriceRequest(symbol string) *GetAveragePriceRequest {
+	return &GetAveragePriceRequest{
+		params: map[string]interface{}{
+			"symbol": symbol,
+		},
+	}
+}
+
 func (c *Client) GetAveragePrice(ctx context.Context, req *GetAveragePriceRequest, opts ...RequestOption) (*GetAveragePriceResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/avgPrice",
 		SecType:  SecTypeNone,
-		Params:   map[string]interface{}{"symbol": req.Symbol},
+		Params:   req.params,
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
