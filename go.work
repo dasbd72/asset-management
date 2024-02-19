@@ -5,9 +5,3 @@ use (
 	./max
 	./okx
 )
-
-replace (
-	github.com/dasbd72/asset-management/binance v0.0.0 => ./binance
-	github.com/dasbd72/asset-management/max v0.0.0 => ./max
-	github.com/dasbd72/asset-management/okx v0.0.0 => ./okx
-)
