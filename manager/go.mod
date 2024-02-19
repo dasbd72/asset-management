@@ -1,6 +1,6 @@
 module github.com/dasbd72/asset-management/manager
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/dasbd72/asset-management/binance v0.0.0-20240219071459-322ce6b28840
