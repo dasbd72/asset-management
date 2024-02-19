@@ -29,3 +29,6 @@ jobs:
 
     - name: MAX Unit Test
       run: go test -v github.com/dasbd72/asset-management/max
+
+    - name: CLI Build Test
+      run: go build -v -o bin/cli ./cmd/cli/...
