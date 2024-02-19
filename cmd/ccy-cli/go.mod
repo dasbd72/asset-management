@@ -1,4 +1,4 @@
-module experimental
+module github.com/dasbd72/asset-management/cmd/ccy-cli
 
 go 1.22
 
