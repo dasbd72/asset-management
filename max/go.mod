@@ -1,4 +1,4 @@
-module github.com/dasbd72/asset-management/max
+module github.com/dasbd72/asset-management/max/v0.0.1
 
 go 1.22
 

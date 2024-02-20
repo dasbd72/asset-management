@@ -1,9 +1,9 @@
-module github.com/dasbd72/asset-management/manager
+module github.com/dasbd72/asset-management/manager/v0.0.1
 
 go 1.22
 
 require (
-	github.com/dasbd72/asset-management/binance v0.0.0-20240219071459-322ce6b28840
-	github.com/dasbd72/asset-management/max v0.0.0-20240219144520-325c0a6d622c
-	github.com/dasbd72/asset-management/okx v0.0.0-20240219144520-325c0a6d622c
+	github.com/dasbd72/asset-management/binance v0.0.0-20240219145431-c2f696b52ef7
+	github.com/dasbd72/asset-management/max v0.0.0-20240219145431-c2f696b52ef7
+	github.com/dasbd72/asset-management/okx v0.0.0-20240219145431-c2f696b52ef7
 )
