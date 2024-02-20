@@ -30,5 +30,8 @@ jobs:
     - name: MAX Unit Test
       run: go test -v github.com/dasbd72/asset-management/max
 
+    - name: Manager Unit Test
+      run: go test -v github.com/dasbd72/asset-management/manager
+
     - name: CLI Build Test
       run: go build -v -o bin/ccy-cli ./cmd/ccy-cli/...
