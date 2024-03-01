@@ -19,7 +19,8 @@ func Binance(cmd *cobra.Command, args []string) {
 	)
 
 	// Start testing
-	data, err := c.GetOrderBook(ctx, binance.NewGetOrderBookRequest("BTCUSDT"))
+	data, err := c.GetUserWalletBalance(ctx)
+	// data, err := c.GetOrderBook(ctx, binance.NewGetOrderBookRequest("BTCUSDT"))
 	if err != nil {
 		log.Fatal(err)
 	}
