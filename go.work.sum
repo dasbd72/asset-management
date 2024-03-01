@@ -1,5 +1,0 @@
-github.com/dasbd72/go-exchange-sdk/binance v0.0.0-20240219071459-322ce6b28840/go.mod h1:7MWjdfOOk6OwTja1SeVFRkyhHB4OkJqoloL9eTDwDUU=
-github.com/dasbd72/go-exchange-sdk/manager v0.0.0-20240219145431-c2f696b52ef7/go.mod h1:zlKOYZrezp5dYoDrWh3Zwo/ll5qXhMQcbh+t6xj0cc8=
-github.com/dasbd72/go-exchange-sdk/max v0.0.0-20240219071459-322ce6b28840/go.mod h1:nQOAzru+GswuHXPTz2Y4KNxMtryD2FxppkqkHkRQopo=
-github.com/dasbd72/go-exchange-sdk/okx v0.0.0-20240219071459-322ce6b28840/go.mod h1:pqzDe3U2v2iB61vcAPfQL6KQ0BHBwwWYydZGGVOLbgw=
-github.com/google/go-cmp v0.5.8 h1:e6P7q2lk1O+qJJb4BtCQXlK8vWEO8V1ZeuEdJNOqZyg=

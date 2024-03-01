@@ -1,8 +1,2 @@
-github.com/dasbd72/go-exchange-sdk/binance v0.0.0-20240219145431-c2f696b52ef7 h1:llyCF+0q9gKd4A1ouI67TXjRo3Vi4Uwl5t/1eMBgooo=
-github.com/dasbd72/go-exchange-sdk/binance v0.0.0-20240219145431-c2f696b52ef7/go.mod h1:7MWjdfOOk6OwTja1SeVFRkyhHB4OkJqoloL9eTDwDUU=
-github.com/dasbd72/go-exchange-sdk/max v0.0.0-20240219145431-c2f696b52ef7 h1:DqDYujgRlJrWQgSdTws+uzlBdAF4RTtzWxnm99FHtZI=
-github.com/dasbd72/go-exchange-sdk/max v0.0.0-20240219145431-c2f696b52ef7/go.mod h1:nQOAzru+GswuHXPTz2Y4KNxMtryD2FxppkqkHkRQopo=
-github.com/dasbd72/go-exchange-sdk/okx v0.0.0-20240219145431-c2f696b52ef7 h1:C5cv0k6cNyFaTJKyLmDJ5MMf3nffubbq9MPZKTttVG8=
-github.com/dasbd72/go-exchange-sdk/okx v0.0.0-20240219145431-c2f696b52ef7/go.mod h1:pqzDe3U2v2iB61vcAPfQL6KQ0BHBwwWYydZGGVOLbgw=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
