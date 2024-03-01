@@ -22,7 +22,12 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 	)
 	funcs := []func() error{
 		func() error {
+			if c.binanceClient == nil {
+				// Skip if binance client is not set
+				return nil
+			}
 			sum := 0.0
+			// Get balance from wallet
 			wallet, err := c.binanceClient.GetUserWalletBalance(ctx)
 			if err != nil {
 				return err
@@ -41,7 +46,12 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			return nil
 		},
 		func() error {
+			if c.okxClient == nil {
+				// Skip if okx client is not set
+				return nil
+			}
 			sum := 0.0
+			// Get balance from wallet
 			wallet, err := c.okxClient.GetBalance(ctx, okx.NewGetBalanceRequest())
 			if err != nil {
 				return err
@@ -49,6 +59,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			for _, w := range wallet.Balances {
 				sum += w.TotalEq.Float64()
 			}
+			// Get balance from funding
 			funding, err := c.okxClient.GetFundingBalances(ctx, okx.NewGetFundingBalancesRequest())
 			if err != nil {
 				return err
@@ -56,6 +67,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			for _, f := range funding.Balances {
 				sum += f.Bal.Float64()
 			}
+			// Get balance from saving
 			savings, err := c.okxClient.GetSavingBalance(ctx, okx.NewGetSavingBalanceRequest())
 			if err != nil {
 				return err
