@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/dasbd72/asset-management/okx"
+	"github.com/dasbd72/go-exchange-sdk/okx"
 	"github.com/spf13/cobra"
 )
 

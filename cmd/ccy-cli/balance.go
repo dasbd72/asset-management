@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dasbd72/asset-management/binance"
-	"github.com/dasbd72/asset-management/manager"
-	"github.com/dasbd72/asset-management/max"
-	"github.com/dasbd72/asset-management/okx"
+	"github.com/dasbd72/go-exchange-sdk/binance"
+	"github.com/dasbd72/go-exchange-sdk/manager"
+	"github.com/dasbd72/go-exchange-sdk/max"
+	"github.com/dasbd72/go-exchange-sdk/okx"
 	"github.com/spf13/cobra"
 )
 

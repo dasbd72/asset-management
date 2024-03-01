@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/dasbd72/asset-management/binance"
+	"github.com/dasbd72/go-exchange-sdk/binance"
 	"github.com/spf13/cobra"
 )
 

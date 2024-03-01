@@ -1,4 +1,4 @@
-module github.com/dasbd72/asset-management/okx
+module github.com/dasbd72/go-exchange-sdk/okx
 
 go 1.22
 

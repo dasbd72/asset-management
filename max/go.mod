@@ -1,4 +1,4 @@
-module github.com/dasbd72/asset-management/max
+module github.com/dasbd72/go-exchange-sdk/max
 
 go 1.22
 

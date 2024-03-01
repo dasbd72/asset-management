@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/dasbd72/asset-management/max"
+	"github.com/dasbd72/go-exchange-sdk/max"
 	"github.com/spf13/cobra"
 )
 

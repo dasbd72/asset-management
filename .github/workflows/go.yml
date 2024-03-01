@@ -22,16 +22,16 @@ jobs:
         go-version: '1.22'
 
     - name: Binance Unit Test
-      run: go test -v github.com/dasbd72/asset-management/binance
+      run: go test -v github.com/dasbd72/go-exchange-sdk/binance
 
     - name: OKX Unit Test
-      run: go test -v github.com/dasbd72/asset-management/okx
+      run: go test -v github.com/dasbd72/go-exchange-sdk/okx
 
     - name: MAX Unit Test
-      run: go test -v github.com/dasbd72/asset-management/max
+      run: go test -v github.com/dasbd72/go-exchange-sdk/max
 
     - name: Manager Unit Test
-      run: go test -v github.com/dasbd72/asset-management/manager
+      run: go test -v github.com/dasbd72/go-exchange-sdk/manager
 
     - name: CLI Build Test
       run: go build -v -o bin/ccy-cli ./cmd/ccy-cli/...

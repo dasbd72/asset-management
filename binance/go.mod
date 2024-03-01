@@ -1,4 +1,4 @@
-module github.com/dasbd72/asset-management/binance
+module github.com/dasbd72/go-exchange-sdk/binance
 
 go 1.22
 
