@@ -67,46 +67,11 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 		opt(r)
 	}
 
-	path := r.endpoint
-	query := url.Values{}
-	header := http.Header{}
-	body := ""
-	// set request parameters
-	if r.method == http.MethodGet {
-		for k, v := range r.params {
-			query.Add(k, fmt.Sprintf("%v", v))
-		}
-	} else {
-		b, err := json.Marshal(r.params)
-		if err != nil {
-			return nil, err
-		}
-		body = string(b)
-		if body == "{}" {
-			body = ""
-		}
-		header.Add("Content-Type", "application/json")
-	}
-	if r.secType == SecTypePrivate {
-		query.Add(timestampKey, fmt.Sprintf("%d", currentTimestamp()))
-	}
-	if len(query) > 0 {
-		path += "?" + query.Encode()
-	}
-	if r.secType == SecTypePrivate {
-		header.Set(apiKeyHeader, c.apiKey)
-		header.Set(signatureHeader, sign(c.apiSecret, r.method+path+body))
-	}
-
-	// create request
-	var req *http.Request
-	var res *http.Response
-	req, err = http.NewRequestWithContext(ctx, r.method, fmt.Sprintf("%s%s", c.apiEndpoint, path), bytes.NewBuffer([]byte(body)))
+	req, err := c.getHttpRequest(ctx, r)
 	if err != nil {
-		return nil, err
+		return []byte{}, err
 	}
-	req.Header = header
-	res, err = c.httpClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -132,6 +97,47 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 		return nil, apiErr
 	}
 	return data, nil
+}
+
+func (c *Client) getHttpRequest(ctx context.Context, r *Request) (*http.Request, error) {
+	var (
+		path   string      = r.endpoint
+		query  url.Values  = url.Values{}
+		header http.Header = http.Header{}
+		body   string
+	)
+	if r.method == http.MethodGet {
+		for k, v := range r.params {
+			query.Add(k, fmt.Sprintf("%v", v))
+		}
+	} else {
+		b, err := json.Marshal(r.params)
+		if err != nil {
+			return nil, err
+		}
+		body = string(b)
+		if body == "{}" {
+			body = ""
+		}
+		header.Add("Content-Type", "application/json")
+	}
+	if r.secType == SecTypePrivate {
+		query.Add(timestampKey, fmt.Sprintf("%d", currentTimestamp()))
+	}
+	if len(query) > 0 {
+		path += "?" + query.Encode()
+	}
+	if r.secType == SecTypePrivate {
+		header.Set(apiKeyHeader, c.apiKey)
+		header.Set(signatureHeader, sign(c.apiSecret, r.method+path+body))
+	}
+	// Create the request
+	req, err := http.NewRequestWithContext(ctx, r.method, fmt.Sprintf("%s%s", c.apiEndpoint, path), bytes.NewBuffer([]byte(body)))
+	if err != nil {
+		return nil, err
+	}
+	req.Header = header
+	return req, nil
 }
 
 func sign(secret, message string) string {
