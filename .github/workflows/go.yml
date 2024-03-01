@@ -33,6 +33,9 @@ jobs:
     - name: MAX Unit Test
       run: go test -v github.com/dasbd72/go-exchange-sdk/max
 
+    - name: Pionex Unit Test
+      run: go test -v github.com/dasbd72/go-exchange-sdk/pionex
+
     - name: Manager Unit Test
       run: go test -v github.com/dasbd72/go-exchange-sdk/manager
 
