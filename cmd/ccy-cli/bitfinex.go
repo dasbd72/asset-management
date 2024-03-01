@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/dasbd72/go-exchange-sdk/bitfinex"
@@ -18,12 +18,6 @@ func Bitfinex(cmd *cobra.Command, args []string) {
 		os.Getenv("BFX_API_SECRET"),
 	)
 
-	res, err := c.CallAPI(ctx, bitfinex.Request_builder{
-		Method:   http.MethodPost,
-		Endpoint: "/auth/r/wallets",
-		SecType:  bitfinex.SecTypePrivate,
-		Params:   map[string]interface{}{},
-	}.Build())
 	// res, err := c.CallAPI(ctx, bitfinex.Request_builder{
 	// 	Method:      http.MethodGet,
 	// 	Endpoint:    "/ticker",
@@ -31,8 +25,13 @@ func Bitfinex(cmd *cobra.Command, args []string) {
 	// 	SecType:     bitfinex.SecTypePrivate,
 	// 	Params:      map[string]interface{}{},
 	// }.Build())
+	data, err := c.GetWalletStatus(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(string(res))
+	b, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(string(b))
 }
