@@ -5,16 +5,31 @@
 This project is created to programmatically manage my crypto currency assets
 from multiple exchanges.
 
-Supported exchanges
+Developing exchanges
 - binance
 - okx
+- pionex
 
 ## Development Environment
 
 - vscode
 - use gofmt to format the code
 
+## Configuration
+
+```conf
+# .env
+BINANCE_API_KEY=your-api-key
+BINANCE_API_SECRET=your-api-secret
+OKX_API_KEY=your-api-key
+OKX_API_SECRET=your-api-secret
+PIONEX_API_KEY=your-api-key
+PIONEX_API_SECRET=your-api-secret
+```
+
 ## References
 
 - [Binance API](https://binance-docs.github.io/apidocs/spot/en/#introduction)
 - [OKX API](https://www.okx.com/docs-v5/en/#overview)
+- [Pionex API](https://pionex-doc.gitbook.io/apidocs/)
+- [MAX API](https://max.maicoin.com/documents/api)
