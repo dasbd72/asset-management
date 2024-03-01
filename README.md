@@ -9,6 +9,7 @@ Developing exchanges
 - binance
 - okx
 - pionex
+- bitfinex
 
 ## Development Environment
 
@@ -32,4 +33,5 @@ PIONEX_API_SECRET=your-api-secret
 - [Binance API](https://binance-docs.github.io/apidocs/spot/en/#introduction)
 - [OKX API](https://www.okx.com/docs-v5/en/#overview)
 - [Pionex API](https://pionex-doc.gitbook.io/apidocs/)
+- [Bitfinex API](https://docs.bitfinex.com/docs)
 - [MAX API](https://max.maicoin.com/documents/api)

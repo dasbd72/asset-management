@@ -27,6 +27,9 @@ jobs:
     - name: OKX Unit Test
       run: go test -v github.com/dasbd72/go-exchange-sdk/okx
 
+    - name: Bitfinex Unit Test
+      run: go test -v github.com/dasbd72/go-exchange-sdk/bitfinex
+
     - name: MAX Unit Test
       run: go test -v github.com/dasbd72/go-exchange-sdk/max
 
