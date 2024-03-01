@@ -88,6 +88,26 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			return nil
 		},
 		func() error {
+			if c.bitfinexClient == nil {
+				// Skip if bitfinex client is not set
+				return nil
+			}
+			sum := 0.0
+			// Get balance from wallet
+			res, err := c.bitfinexClient.GetWallets(ctx)
+			if err != nil {
+				return err
+			}
+			for _, w := range res.Wallet {
+				if w.Currency == "USD" || w.Currency == "UST" {
+					sum += w.Balance.Float64()
+				}
+			}
+
+			totalBalanceUsdt += sum
+			return nil
+		},
+		func() error {
 			usdtToTWD, err := max.GetUsdtToTWD()
 			if err != nil {
 				return err

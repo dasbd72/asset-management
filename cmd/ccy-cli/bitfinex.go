@@ -25,7 +25,7 @@ func Bitfinex(cmd *cobra.Command, args []string) {
 	// 	SecType:     bitfinex.SecTypePrivate,
 	// 	Params:      map[string]interface{}{},
 	// }.Build())
-	data, err := c.GetWalletStatus(ctx)
+	data, err := c.GetWallets(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
