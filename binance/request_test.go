@@ -19,6 +19,7 @@ func TestBuild(t *testing.T) {
 			want: &Request{
 				method:     http.MethodGet,
 				endpoint:   "",
+				apiType:    ApiTypeSpot,
 				secType:    SecTypeNone,
 				recvWindow: 0,
 				params:     map[string]interface{}{},
@@ -29,12 +30,14 @@ func TestBuild(t *testing.T) {
 			b: Request_builder{
 				Method:   http.MethodPost,
 				Endpoint: "/test",
+				ApiType:  ApiTypeFutures,
 				SecType:  SecTypeAPIKey,
 				Params:   map[string]interface{}{"test": "test"},
 			},
 			want: &Request{
 				method:     http.MethodPost,
 				endpoint:   "/test",
+				apiType:    ApiTypeFutures,
 				secType:    SecTypeAPIKey,
 				recvWindow: 0,
 				params:     map[string]interface{}{"test": "test"},

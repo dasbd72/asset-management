@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type Client struct {
@@ -23,10 +22,8 @@ type Client struct {
 
 // Endpoints
 const (
-	baseAPIMainURL       = "https://api.binance.com"
-	baseAPITestnetURL    = "https://testnet.binance.vision"
-	futuresAPIMainURL    = "https://fapi.binance.com"
-	futuresAPITestnetURL = "https://testnet.binancefuture.com"
+	baseAPIMainURL    = "https://api.binance.com"
+	futuresAPIMainURL = "https://fapi.binance.com"
 
 	timestampKey  = "timestamp"
 	signatureKey  = "signature"
@@ -35,25 +32,6 @@ const (
 	apiKeyHeader = "X-MBX-APIKEY"
 )
 
-// UseTestnet switch all the API endpoints from production to the testnet
-var UseTestnet = false
-
-// getAPIEndpoint return the base endpoint of the Rest API according the UseTestnet flag
-func getAPIEndpoint() string {
-	if UseTestnet {
-		return baseAPITestnetURL
-	}
-	return baseAPIMainURL
-}
-
-// getFuturesAPIEndpoint return the base endpoint of the Futures Rest API according the UseTestnet flag
-func getFuturesAPIEndpoint() string {
-	if UseTestnet {
-		return futuresAPITestnetURL
-	}
-	return futuresAPIMainURL
-}
-
 // NewClient initialize an API client instance with API key and secret key.
 // You should always call this function before using this SDK.
 // Services will be created by the form client.NewXXXService().
@@ -61,8 +39,8 @@ func NewClient(apiKey, apiSecret string) *Client {
 	return &Client{
 		apiKey:             apiKey,
 		apiSecret:          apiSecret,
-		apiEndpoint:        getAPIEndpoint(),
-		futuresAPIEndpoint: getFuturesAPIEndpoint(),
+		apiEndpoint:        baseAPIMainURL,
+		futuresAPIEndpoint: futuresAPIMainURL,
 		httpClient:         http.DefaultClient,
 	}
 }
@@ -73,76 +51,14 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 		opt(r)
 	}
 
-	var (
-		u        string
-		req      *http.Request
-		query    url.Values = url.Values{}
-		body     string
-		queryStr string
-	)
-	// choose the endpoint
-	if strings.HasPrefix(r.endpoint, "/fapi") {
-		u = fmt.Sprintf("%s%s", c.futuresAPIEndpoint, r.endpoint)
-	} else {
-		u = fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
+	req, err := c.getHttpRequest(ctx, r)
+	if err != nil {
+		return []byte{}, err
 	}
-	// set the parameters
-	if r.recvWindow > 0 {
-		r.params[recvWindowKey] = r.recvWindow
-	}
-	if r.secType == SecTypeSigned {
-		r.params[timestampKey] = currentTimestamp()
-	}
-	if r.method == http.MethodGet {
-		for k, v := range r.params {
-			query.Add(k, fmt.Sprintf("%v", v))
-		}
-	} else {
-		form := url.Values{}
-		for k, v := range r.params {
-			form.Add(k, fmt.Sprintf("%v", v))
-		}
-		body = form.Encode()
-	}
-	if len(query) > 0 {
-		queryStr = query.Encode()
-	}
-	if r.secType == SecTypeSigned {
-		// sign the request
-		raw := fmt.Sprintf("%s%s", queryStr, body)
-		mac := hmac.New(sha256.New, []byte(c.apiSecret))
-		_, err = mac.Write([]byte(raw))
-		if err != nil {
-			return []byte{}, err
-		}
-		v := url.Values{}
-		v.Set(signatureKey, fmt.Sprintf("%x", (mac.Sum(nil))))
-		if queryStr == "" {
-			queryStr = v.Encode()
-		} else {
-			queryStr = fmt.Sprintf("%s&%s", queryStr, v.Encode())
-		}
-	}
-	if queryStr != "" {
-		// add the query string to the url
-		u = fmt.Sprintf("%s?%s", u, queryStr)
-	}
-	// create the request
-	req, err = http.NewRequest(r.method, u, bytes.NewBuffer([]byte(body)))
-	if body != "" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
-	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
-		req.Header.Set(apiKeyHeader, c.apiKey)
-	}
-	req = req.WithContext(ctx)
-
-	// do the request
 	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}
-
 	data, err = io.ReadAll(res.Body)
 	if err != nil {
 		return []byte{}, err
@@ -168,4 +84,68 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 		return nil, apiErr
 	}
 	return data, nil
+}
+
+func (c *Client) getHttpRequest(ctx context.Context, r *Request) (*http.Request, error) {
+	var (
+		u      string
+		req    *http.Request
+		query  url.Values  = url.Values{}
+		header http.Header = http.Header{}
+		body   string
+	)
+	// Build the URL
+	if r.apiType == ApiTypeSpot {
+		u = fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
+	} else {
+		u = fmt.Sprintf("%s%s", c.futuresAPIEndpoint, r.endpoint)
+	}
+	// Set the request parameters
+	if r.recvWindow > 0 {
+		r.params[recvWindowKey] = r.recvWindow
+	}
+	if r.secType == SecTypeSigned {
+		r.params[timestampKey] = currentTimestamp()
+	}
+	if r.method == http.MethodGet {
+		// Add the parameters to the query string
+		for k, v := range r.params {
+			query.Add(k, fmt.Sprintf("%v", v))
+		}
+	} else {
+		// Add the parameters to the request body
+		form := url.Values{}
+		for k, v := range r.params {
+			form.Add(k, fmt.Sprintf("%v", v))
+		}
+		body = form.Encode()
+		if body != "" {
+			header.Set("Content-Type", "application/x-www-form-urlencoded")
+		}
+	}
+	if r.secType == SecTypeSigned {
+		// Add the signature to the query string
+		query.Set(signatureKey, sign(c.apiSecret, query.Encode()))
+	}
+	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
+		// Add the API key to the header
+		header.Set(apiKeyHeader, c.apiKey)
+	}
+	if len(query) > 0 {
+		// add the query string to the url
+		u = fmt.Sprintf("%s?%s", u, query.Encode())
+	}
+	// create the request
+	req, err := http.NewRequestWithContext(ctx, r.method, u, bytes.NewBuffer([]byte(body)))
+	if err != nil {
+		return nil, err
+	}
+	req.Header = header
+	return req, nil
+}
+
+func sign(secret, message string) string {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(message))
+	return fmt.Sprintf("%x", mac.Sum(nil))
 }

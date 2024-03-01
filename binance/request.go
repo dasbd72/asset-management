@@ -1,6 +1,9 @@
 package binance
 
-type SecType int
+type (
+	SecType int
+	ApiType int
+)
 
 const (
 	// SecTypeNone defines no security type
@@ -11,10 +14,18 @@ const (
 	SecTypeSigned // if the 'timestamp' parameter is required
 )
 
+const (
+	// ApiTypeSpot uses baseAPIMainURL
+	ApiTypeSpot ApiType = iota
+	// ApiTypeFutures uses futuresAPIMainURL
+	ApiTypeFutures
+)
+
 // Request define an API request, build with Request_builder
 type Request struct {
 	method     string
 	endpoint   string
+	apiType    ApiType
 	secType    SecType
 	recvWindow int64
 	params     map[string]interface{}
@@ -24,6 +35,7 @@ type Request struct {
 type Request_builder struct {
 	Method   string
 	Endpoint string
+	ApiType  ApiType
 	SecType  SecType
 	Params   map[string]interface{}
 }
@@ -39,6 +51,7 @@ func (b Request_builder) Build() *Request {
 	return &Request{
 		method:     b.Method,
 		endpoint:   b.Endpoint,
+		apiType:    b.ApiType,
 		secType:    b.SecType,
 		recvWindow: 0,
 		params:     b.Params,
