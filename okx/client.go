@@ -1,7 +1,6 @@
 package okx
 
 import (
-	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -9,15 +8,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 const (
 	baseAPIRestURL = "https://www.okx.com"
-	baseAPIDemoURL = "https://www.okx.com"
 )
 
 type Client struct {
@@ -26,8 +22,6 @@ type Client struct {
 	passphrase  string
 	apiEndpoint string
 	httpClient  *http.Client
-	logger      *log.Logger
-	debugging   bool
 }
 
 const (
@@ -38,33 +32,14 @@ const (
 	simulateHeader   = "x-simulated-trading"
 )
 
-// UseDemo switch all the API endpoints from production to the testnet
-var UseDemo = false
-
-// getAPIEndpoint return the base endpoint of the Rest API according the UseDemo flag
-func getAPIEndpoint() string {
-	if UseDemo {
-		return baseAPIDemoURL
-	}
-	return baseAPIRestURL
-}
-
 // NewClient initialize an API client instance with API key and secret key.
 func NewClient(apiKey, apiSecret, passphrase string) *Client {
 	return &Client{
 		apiKey:      apiKey,
 		apiSecret:   apiSecret,
 		passphrase:  passphrase,
-		apiEndpoint: getAPIEndpoint(),
+		apiEndpoint: baseAPIRestURL,
 		httpClient:  http.DefaultClient,
-		logger:      log.New(os.Stderr, "OKX", log.LstdFlags),
-		debugging:   false,
-	}
-}
-
-func (c *Client) debug(format string, v ...interface{}) {
-	if c.debugging {
-		c.logger.Printf(format, v...)
 	}
 }
 
@@ -74,56 +49,10 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 		opt(r)
 	}
 
-	u := fmt.Sprintf("%s%s", c.apiEndpoint, r.endpoint)
-	path := r.endpoint
-	var (
-		req  *http.Request
-		body string
-	)
-	if r.method == http.MethodGet {
-		query := url.Values{}
-		for k, v := range r.params {
-			query.Add(k, fmt.Sprintf("%v", v))
-		}
-		if len(query) > 0 {
-			u += "?" + query.Encode()
-			path += "?" + query.Encode()
-		}
-		req, err = http.NewRequest(r.method, u, nil)
-	} else {
-		b, err := json.Marshal(r.params)
-		if err != nil {
-			return nil, err
-		}
-		body = string(b)
-		if body == "{}" {
-			body = ""
-		}
-		req, err = http.NewRequest(r.method, u, bytes.NewBuffer(b))
-		if err != nil {
-			return []byte{}, err
-		}
-		req.Header.Add("Content-Type", "application/json")
+	req, err := c.getHttpRequest(ctx, r)
+	if err != nil {
+		return []byte{}, err
 	}
-	c.debug("full url: %s, body: %s", u, body)
-	if r.secType == SecTypePrivate {
-		ts := currentTimestamp()
-		mac := hmac.New(sha256.New, []byte(c.apiSecret))
-		_, err = mac.Write([]byte(ts + r.method + path + body))
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set(apiKeyHeader, c.apiKey)
-		req.Header.Set(passphraseHeader, c.passphrase)
-		req.Header.Set(timestampHeader, ts)
-		req.Header.Set(signHeader, base64.StdEncoding.EncodeToString(mac.Sum(nil)))
-	}
-	if UseDemo {
-		req.Header.Set(simulateHeader, "1")
-	}
-	req = req.WithContext(ctx)
-	c.debug("request: %#v", req)
 	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return []byte{}, err
@@ -140,17 +69,64 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 			err = cerr
 		}
 	}()
-	c.debug("response: %#v", res)
-	c.debug("response body: %s", string(data))
-	c.debug("response status code: %d", res.StatusCode)
 
 	if res.StatusCode >= http.StatusBadRequest {
 		apiErr := &APIError{}
 		e := json.Unmarshal(data, apiErr)
 		if e != nil {
-			c.debug("failed to unmarshal json: %s", e)
+			return nil, &APIError{
+				Code:    int64(-1),
+				Message: fmt.Sprintf("error unmarshalling response %s: %s", data, e.Error()),
+			}
 		}
 		return nil, apiErr
 	}
 	return data, nil
+}
+
+func (c *Client) getHttpRequest(ctx context.Context, r *Request) (*http.Request, error) {
+	var (
+		path   string      = r.endpoint
+		header http.Header = http.Header{}
+		body   string
+	)
+	if r.method == http.MethodGet {
+		query := url.Values{}
+		for k, v := range r.params {
+			query.Add(k, fmt.Sprintf("%v", v))
+		}
+		if len(query) > 0 {
+			path += "?" + query.Encode()
+		}
+	} else {
+		b, err := json.Marshal(r.params)
+		if err != nil {
+			return nil, err
+		}
+		body = string(b)
+		if body == "{}" {
+			body = ""
+		}
+		header.Add("Content-Type", "application/json")
+	}
+	if r.secType == SecTypePrivate {
+		ts := currentTimestamp()
+		header.Set(apiKeyHeader, c.apiKey)
+		header.Set(passphraseHeader, c.passphrase)
+		header.Set(timestampHeader, ts)
+		header.Set(signHeader, sign(c.apiSecret, fmt.Sprintf("%s%s%s%s", ts, r.method, path, body)))
+	}
+	// Create the request
+	req, err := http.NewRequestWithContext(ctx, r.method, fmt.Sprintf("%s%s", c.apiEndpoint, path), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = header
+	return req, nil
+}
+
+func sign(secret, message string) string {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(message))
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
