@@ -22,22 +22,22 @@ jobs:
         go-version: '1.22'
 
     - name: Binance Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/binance
+      run: go test -v github.com/dasbd72/go-exchange-sdk/binance/...
 
     - name: OKX Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/okx
+      run: go test -v github.com/dasbd72/go-exchange-sdk/okx/...
 
     - name: Bitfinex Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/bitfinex
+      run: go test -v github.com/dasbd72/go-exchange-sdk/bitfinex/...
 
     - name: MAX Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/max
+      run: go test -v github.com/dasbd72/go-exchange-sdk/max/...
 
     - name: Pionex Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/pionex
+      run: go test -v github.com/dasbd72/go-exchange-sdk/pionex/...
 
     - name: Manager Unit Test
-      run: go test -v github.com/dasbd72/go-exchange-sdk/manager
+      run: go test -v github.com/dasbd72/go-exchange-sdk/manager/...
 
     - name: CLI Build Test
       run: go build -v -o bin/ccy-cli ./cmd/ccy-cli/...
