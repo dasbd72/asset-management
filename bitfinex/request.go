@@ -22,11 +22,10 @@ type Request struct {
 
 // Request_builder define a builder for Request
 type Request_builder struct {
-	Method      string
-	Endpoint    string
-	SubEndpoint string
-	SecType     SecType
-	Params      map[string]interface{}
+	Method   string
+	Endpoint string
+	SecType  SecType
+	Params   map[string]interface{}
 }
 
 // Build create a new Request
@@ -38,11 +37,10 @@ func (b Request_builder) Build() *Request {
 		b.Params = map[string]interface{}{}
 	}
 	return &Request{
-		method:      b.Method,
-		endpoint:    b.Endpoint,
-		subEndpoint: b.SubEndpoint,
-		secType:     b.SecType,
-		params:      b.Params,
+		method:   b.Method,
+		endpoint: b.Endpoint,
+		secType:  b.SecType,
+		params:   b.Params,
 	}
 }
 

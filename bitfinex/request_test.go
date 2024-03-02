@@ -25,18 +25,16 @@ func TestBuild(t *testing.T) {
 		{
 			name: "non-empty",
 			b: Request_builder{
-				Method:      http.MethodPost,
-				Endpoint:    "/test",
-				SubEndpoint: "/BTCUSD",
-				SecType:     SecTypePrivate,
-				Params:      map[string]interface{}{"test": "test"},
+				Method:   http.MethodPost,
+				Endpoint: "/test",
+				SecType:  SecTypePrivate,
+				Params:   map[string]interface{}{"test": "test"},
 			},
 			want: &Request{
-				method:      http.MethodPost,
-				endpoint:    "/test",
-				subEndpoint: "/BTCUSD",
-				secType:     SecTypePrivate,
-				params:      map[string]interface{}{"test": "test"},
+				method:   http.MethodPost,
+				endpoint: "/test",
+				secType:  SecTypePrivate,
+				params:   map[string]interface{}{"test": "test"},
 			},
 		},
 	}
