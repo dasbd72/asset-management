@@ -88,13 +88,13 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			return nil
 		},
 		func() error {
-			if c.bitfinexClient == nil {
+			if c.bitfinexRestClient == nil {
 				// Skip if bitfinex client is not set
 				return nil
 			}
 			sum := 0.0
 			// Get balance from wallet
-			res, err := c.bitfinexClient.GetWallets(ctx)
+			res, err := c.bitfinexRestClient.GetWallets(ctx)
 			if err != nil {
 				return err
 			}
