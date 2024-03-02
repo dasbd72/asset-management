@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/cast"
 )
 
 type (
@@ -11,13 +13,13 @@ type (
 		Wallet []Wallet `json:"wallet"`
 	}
 	Wallet struct {
-		Type               string      `json:"type"`
-		Currency           string      `json:"currency"`
-		Balance            JSONFloat64 `json:"balance"`
-		UnsettledInterest  JSONFloat64 `json:"unsettled_interest"`
-		AvailableBalance   JSONFloat64 `json:"available_balance"`
-		LastChange         string      `json:"last_change"`
-		LastChangeMetadata interface{} `json:"last_change_metadata"`
+		Type               cast.NilOrString
+		Currency           cast.NilOrString
+		Balance            cast.NilOrFloat64
+		UnsettledInterest  cast.NilOrFloat64
+		AvailableBalance   cast.NilOrFloat64
+		LastChange         cast.NilOrString
+		LastChangeMetadata interface{}
 	}
 )
 
@@ -28,18 +30,13 @@ func (data *GetWalletsResponse) FromRaw(raw []byte) error {
 		return err
 	}
 	for _, v := range container {
-		for i, vv := range v {
-			if vv == nil {
-				v[i] = ""
-			}
-		}
 		data.Wallet = append(data.Wallet, Wallet{
-			Type:               v[0].(string),
-			Currency:           v[1].(string),
-			Balance:            JSONFloat64(v[2].(float64)),
-			UnsettledInterest:  JSONFloat64(v[3].(float64)),
-			AvailableBalance:   JSONFloat64(v[4].(float64)),
-			LastChange:         v[5].(string),
+			Type:               cast.IfToNilOrString(v[0]),
+			Currency:           cast.IfToNilOrString(v[1]),
+			Balance:            cast.IfToNilOrFloat64(v[2]),
+			UnsettledInterest:  cast.IfToNilOrFloat64(v[3]),
+			AvailableBalance:   cast.IfToNilOrFloat64(v[4]),
+			LastChange:         cast.IfToNilOrString(v[5]),
 			LastChangeMetadata: v[6],
 		})
 	}

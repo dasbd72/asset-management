@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/cast"
 )
 
 type (
@@ -12,32 +14,32 @@ type (
 		FundingStatArray []FundingStat `json:"funding_stat_array"`
 	}
 	FundingStat struct {
-		MTS                         JSONInt64   `json:"mts"`
-		FRR                         JSONFloat64 `json:"frr"`
-		AvgPeriod                   JSONFloat64 `json:"avg_period"`
-		FundingAmount               JSONFloat64 `json:"funding_amount"`
-		FundingAmountUsed           JSONFloat64 `json:"funding_amount_used"`
-		FundingAmountBelowThreshold JSONFloat64 `json:"funding_amount_below_threshold"`
+		MTS                         cast.NilOrInt     `json:"mts"`
+		FRR                         cast.NilOrFloat64 `json:"frr"`
+		AvgPeriod                   cast.NilOrFloat64 `json:"avg_period"`
+		FundingAmount               cast.NilOrFloat64 `json:"funding_amount"`
+		FundingAmountUsed           cast.NilOrFloat64 `json:"funding_amount_used"`
+		FundingAmountBelowThreshold cast.NilOrFloat64 `json:"funding_amount_below_threshold"`
 	}
 
 	GetActiveFundingOffers struct {
 		FundingOfferArray []FundingOffer `json:"funding_offer_array"`
 	}
 	FundingOffer struct {
-		ID         JSONInt64   `json:"id"`
-		Symbol     string      `json:"symbol"`
-		MTSCreated JSONInt64   `json:"mts_create"`
-		MTSUpdated JSONInt64   `json:"mts_update"`
-		Amount     JSONFloat64 `json:"amount"`
-		AmountOrig JSONFloat64 `json:"amount_orig"`
-		Type       string      `json:"type"`
-		Flags      interface{} `json:"flags"`
-		Status     string      `json:"status"`
-		Rate       JSONFloat64 `json:"rate"`
-		Period     JSONInt64   `json:"period"`
-		Notify     bool        `json:"notify"`
-		Hidden     bool        `json:"hidden"`
-		Renew      bool        `json:"renew"`
+		ID         cast.NilOrInt     `json:"id"`
+		Symbol     cast.NilOrString  `json:"symbol"`
+		MTSCreated cast.NilOrInt     `json:"mts_create"`
+		MTSUpdated cast.NilOrInt     `json:"mts_update"`
+		Amount     cast.NilOrFloat64 `json:"amount"`
+		AmountOrig cast.NilOrFloat64 `json:"amount_orig"`
+		Type       cast.NilOrString  `json:"type"`
+		Flags      interface{}       `json:"flags"`
+		Status     cast.NilOrString  `json:"status"`
+		Rate       cast.NilOrFloat64 `json:"rate"`
+		Period     cast.NilOrInt     `json:"period"`
+		Notify     cast.NilOrInt     `json:"notify"`
+		Hidden     cast.NilOrInt     `json:"hidden"`
+		Renew      cast.NilOrInt     `json:"renew"`
 	}
 )
 
@@ -54,12 +56,12 @@ func (data *GetFundingStats) FromRaw(raw []byte) error {
 			}
 		}
 		data.FundingStatArray = append(data.FundingStatArray, FundingStat{
-			MTS:                         JSONInt64(v[0].(float64)),
-			FRR:                         JSONFloat64(v[3].(float64)),
-			AvgPeriod:                   JSONFloat64(v[4].(float64)),
-			FundingAmount:               JSONFloat64(v[7].(float64)),
-			FundingAmountUsed:           JSONFloat64(v[8].(float64)),
-			FundingAmountBelowThreshold: JSONFloat64(v[11].(float64)),
+			MTS:                         cast.IfToNilOrInt(v[0]),
+			FRR:                         cast.IfToNilOrFloat64(v[3]),
+			AvgPeriod:                   cast.IfToNilOrFloat64(v[4]),
+			FundingAmount:               cast.IfToNilOrFloat64(v[7]),
+			FundingAmountUsed:           cast.IfToNilOrFloat64(v[8]),
+			FundingAmountBelowThreshold: cast.IfToNilOrFloat64(v[11]),
 		})
 	}
 	return nil
@@ -95,20 +97,20 @@ func (data *GetActiveFundingOffers) FromRaw(raw []byte) error {
 			}
 		}
 		data.FundingOfferArray = append(data.FundingOfferArray, FundingOffer{
-			ID:         JSONInt64(v[0].(float64)),
-			Symbol:     v[1].(string),
-			MTSCreated: JSONInt64(v[2].(float64)),
-			MTSUpdated: JSONInt64(v[3].(float64)),
-			Amount:     JSONFloat64(v[4].(float64)),
-			AmountOrig: JSONFloat64(v[5].(float64)),
-			Type:       v[6].(string),
-			Flags:      v[7],
-			Status:     v[8].(string),
-			Rate:       JSONFloat64(v[9].(float64)),
-			Period:     JSONInt64(v[10].(float64)),
-			Notify:     v[11].(bool),
-			Hidden:     v[12].(bool),
-			Renew:      v[13].(bool),
+			ID:         cast.IfToNilOrInt(v[0]),
+			Symbol:     cast.IfToNilOrString(v[1]),
+			MTSCreated: cast.IfToNilOrInt(v[2]),
+			MTSUpdated: cast.IfToNilOrInt(v[3]),
+			Amount:     cast.IfToNilOrFloat64(v[4]),
+			AmountOrig: cast.IfToNilOrFloat64(v[5]),
+			Type:       cast.IfToNilOrString(v[6]),
+			Flags:      cast.IfToNilOrString(v[7]),
+			Status:     cast.IfToNilOrString(v[8]),
+			Rate:       cast.IfToNilOrFloat64(v[9]),
+			Period:     cast.IfToNilOrInt(v[10]),
+			Notify:     cast.IfToNilOrInt(v[11]),
+			Hidden:     cast.IfToNilOrInt(v[12]),
+			Renew:      cast.IfToNilOrInt(v[13]),
 		})
 	}
 	return nil
@@ -123,7 +125,6 @@ func (c *Client) GetActiveFundingOffers(ctx context.Context, symbol string, opts
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(res))
 	data := &GetActiveFundingOffers{}
 	err = data.FromRaw(res)
 	if err != nil {
