@@ -262,8 +262,23 @@ func TestNilOrFloat64_Float64(t *testing.T) {
 			want:   0,
 		},
 		{
-			name:   "Text",
+			name:   "Text (invalid)",
 			fields: fields{value: "test"},
+			want:   0,
+		},
+		{
+			name:   "Text (valid)",
+			fields: fields{value: "123.45"},
+			want:   123.45,
+		},
+		{
+			name:   "Number",
+			fields: fields{value: 123},
+			want:   123,
+		},
+		{
+			name:   "Bool",
+			fields: fields{value: true},
 			want:   0,
 		},
 	}
@@ -368,8 +383,23 @@ func TestNilOrFloat64_Valid(t *testing.T) {
 			want:   true,
 		},
 		{
-			name:   "Text",
+			name:   "Text (invalid)",
 			fields: fields{value: "test"},
+			want:   false,
+		},
+		{
+			name:   "Text (valid)",
+			fields: fields{value: "123.45"},
+			want:   true,
+		},
+		{
+			name:   "Number",
+			fields: fields{value: 123},
+			want:   true,
+		},
+		{
+			name:   "Bool",
+			fields: fields{value: true},
 			want:   false,
 		},
 	}
@@ -484,8 +514,33 @@ func TestNilOrInt_Int(t *testing.T) {
 			want:   0,
 		},
 		{
-			name:   "Text",
+			name:   "Text (invalid)",
 			fields: fields{value: "test"},
+			want:   0,
+		},
+		{
+			name:   "Text (valid)",
+			fields: fields{value: "123"},
+			want:   123,
+		},
+		{
+			name:   "Float",
+			fields: fields{value: 123.45},
+			want:   123,
+		},
+		{
+			name:   "Bool (true)",
+			fields: fields{value: true},
+			want:   1,
+		},
+		{
+			name:   "Bool (false)",
+			fields: fields{value: false},
+			want:   0,
+		},
+		{
+			name:   "List (invalid)",
+			fields: fields{value: interface{}([]int{1, 2, 3})},
 			want:   0,
 		},
 	}
@@ -585,8 +640,33 @@ func TestNilOrInt_Valid(t *testing.T) {
 			want:   true,
 		},
 		{
-			name:   "Text",
+			name:   "Text (invalid)",
 			fields: fields{value: "test"},
+			want:   false,
+		},
+		{
+			name:   "Text (valid)",
+			fields: fields{value: "123"},
+			want:   true,
+		},
+		{
+			name:   "Float",
+			fields: fields{value: 123.45},
+			want:   true,
+		},
+		{
+			name:   "Bool (true)",
+			fields: fields{value: true},
+			want:   true,
+		},
+		{
+			name:   "Bool (false)",
+			fields: fields{value: false},
+			want:   true,
+		},
+		{
+			name:   "List (invalid)",
+			fields: fields{value: interface{}([]int{1, 2, 3})},
 			want:   false,
 		},
 	}

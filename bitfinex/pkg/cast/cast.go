@@ -75,10 +75,22 @@ func (v NilOrFloat64) Float64() float64 {
 	if v.value == nil {
 		return 0
 	}
-	if _, ok := v.value.(float64); !ok {
-		return 0
+	switch v.value.(type) {
+	case string:
+		f, err := strconv.ParseFloat(v.value.(string), 64)
+		if err != nil {
+			return 0
+		}
+		return f
+	case int:
+		return float64(v.value.(int))
+	default:
+		val, ok := v.value.(float64)
+		if !ok {
+			return 0
+		}
+		return val
 	}
-	return v.value.(float64)
 }
 
 func (v NilOrFloat64) Value() interface{} {
@@ -93,10 +105,22 @@ func (v NilOrFloat64) Valid() bool {
 	if v.value == nil {
 		return true
 	}
-	if _, ok := v.value.(float64); !ok {
-		return false
+	switch v.value.(type) {
+	case string:
+		_, err := strconv.ParseFloat(v.value.(string), 64)
+		if err != nil {
+			return false
+		}
+		return true
+	case int:
+		return true
+	default:
+		_, ok := v.value.(float64)
+		if !ok {
+			return false
+		}
+		return true
 	}
-	return true
 }
 
 func (v NilOrFloat64) MarshalJSON() ([]byte, error) {
@@ -104,11 +128,10 @@ func (v NilOrFloat64) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	// check type
-	_, ok := v.value.(float64)
-	if !ok {
+	if !v.Valid() {
 		return nil, fmt.Errorf("value is not float64 type: %v", v.value)
 	}
-	return []byte(strconv.FormatFloat(v.value.(float64), 'f', -1, 64)), nil
+	return []byte(strconv.FormatFloat(v.Float64(), 'f', -1, 64)), nil
 }
 
 // NilOrInt is a helper type to convert nil or int
@@ -121,10 +144,27 @@ func (v NilOrInt) Int() int {
 	if v.value == nil {
 		return 0
 	}
-	if _, ok := v.value.(int); !ok {
+	switch v.value.(type) {
+	case string:
+		i, err := strconv.Atoi(v.value.(string))
+		if err != nil {
+			return 0
+		}
+		return i
+	case float64:
+		return int(v.value.(float64))
+	case bool:
+		if v.value.(bool) {
+			return 1
+		}
 		return 0
+	default:
+		val, ok := v.value.(int)
+		if !ok {
+			return 0
+		}
+		return val
 	}
-	return v.value.(int)
 }
 
 func (v NilOrInt) Value() interface{} {
@@ -139,10 +179,24 @@ func (v NilOrInt) Valid() bool {
 	if v.value == nil {
 		return true
 	}
-	if _, ok := v.value.(int); !ok {
-		return false
+	switch v.value.(type) {
+	case string:
+		_, err := strconv.Atoi(v.value.(string))
+		if err != nil {
+			return false
+		}
+		return true
+	case float64:
+		return true
+	case bool:
+		return true
+	default:
+		_, ok := v.value.(int)
+		if !ok {
+			return false
+		}
+		return true
 	}
-	return true
 }
 
 func (v NilOrInt) MarshalJSON() ([]byte, error) {
@@ -150,9 +204,8 @@ func (v NilOrInt) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	// check type
-	_, ok := v.value.(int)
-	if !ok {
+	if !v.Valid() {
 		return nil, fmt.Errorf("value is not int type: %v", v.value)
 	}
-	return []byte(strconv.FormatInt(int64(v.value.(int)), 10)), nil
+	return []byte(strconv.FormatInt(int64(v.Int()), 10)), nil
 }
