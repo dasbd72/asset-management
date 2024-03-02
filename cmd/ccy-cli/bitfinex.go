@@ -39,19 +39,19 @@ func Bitfinex(cmd *cobra.Command, args []string) {
 		}
 		log.Println(string(b))
 	}
+	// {
+	// 	data, err := c.GetFundingStats(ctx, "fUST")
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	b, err := json.MarshalIndent(data, "", "  ")
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	log.Println(string(b))
+	// }
 	{
-		data, err := c.GetActiveFundingOffers(ctx, "UST")
-		if err != nil {
-			log.Fatal(err)
-		}
-		b, err := json.MarshalIndent(data, "", "  ")
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(string(b))
-	}
-	{
-		data, err := c.GetFundingStats(ctx, "UST")
+		data, err := c.GetActiveFundingOffers(ctx, "fUSD")
 		if err != nil {
 			log.Fatal(err)
 		}
