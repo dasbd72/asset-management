@@ -47,6 +47,7 @@ func (c *Client) GetWallets(ctx context.Context, opts ...RequestOption) (*GetWal
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodPost,
 		Endpoint: "/auth/r/wallets",
+		Version:  Version2,
 		SecType:  SecTypePrivate,
 	}.Build(), opts...)
 	if err != nil {

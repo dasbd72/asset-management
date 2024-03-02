@@ -1,8 +1,17 @@
 package bitfinex
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type SecType int
+
+const (
+	// Version1 is for v1 API
+	Version1 = "/v1"
+	// Version2 is for v2 API
+	Version2 = "/v2"
+)
 
 const (
 	// SecTypePublic is for public API
@@ -13,17 +22,18 @@ const (
 
 // Request define an API request, build with Request_builder
 type Request struct {
-	method      string
-	endpoint    string
-	subEndpoint string
-	secType     SecType
-	params      map[string]interface{}
+	method   string
+	endpoint string
+	version  string
+	secType  SecType
+	params   map[string]interface{}
 }
 
 // Request_builder define a builder for Request
 type Request_builder struct {
 	Method   string
 	Endpoint string
+	Version  string
 	SecType  SecType
 	Params   map[string]interface{}
 }
@@ -39,6 +49,7 @@ func (b Request_builder) Build() *Request {
 	return &Request{
 		method:   b.Method,
 		endpoint: b.Endpoint,
+		version:  b.Version,
 		secType:  b.SecType,
 		params:   b.Params,
 	}

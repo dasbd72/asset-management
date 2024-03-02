@@ -71,6 +71,7 @@ func (c *Client) GetFundingStats(ctx context.Context, symbol string, opts ...Req
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: fmt.Sprintf("/funding/stats/%s/hist", symbol),
+		Version:  Version2,
 		SecType:  SecTypePublic,
 	}.Build(), opts...)
 	if err != nil {
@@ -120,6 +121,7 @@ func (c *Client) GetActiveFundingOffers(ctx context.Context, symbol string, opts
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodPost,
 		Endpoint: fmt.Sprintf("/auth/r/funding/offers/%s", symbol),
+		Version:  Version2,
 		SecType:  SecTypePrivate,
 	}.Build(), opts...)
 	if err != nil {

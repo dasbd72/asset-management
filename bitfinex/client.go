@@ -23,8 +23,8 @@ type Client struct {
 }
 
 const (
-	basePublicApiURL  = "https://api-pub.bitfinex.com/v2"
-	basePrivateApiURL = "https://api.bitfinex.com/v2"
+	basePublicApiURL  = "https://api-pub.bitfinex.com"
+	basePrivateApiURL = "https://api.bitfinex.com"
 
 	apiKeyHeader    = "bfx-apikey"
 	nonceHeader     = "bfx-nonce"
@@ -84,7 +84,7 @@ func (c *Client) CallAPI(ctx context.Context, r *Request, opts ...RequestOption)
 
 func (c *Client) getHttpRequest(ctx context.Context, r *Request) (*http.Request, error) {
 	apiEndpoint := c.publicApiEndpoint
-	path := fmt.Sprintf("%s%s", r.endpoint, r.subEndpoint)
+	path := r.endpoint
 	query := url.Values{}
 	header := http.Header{}
 	body := ""
@@ -112,10 +112,10 @@ func (c *Client) getHttpRequest(ctx context.Context, r *Request) (*http.Request,
 		nonce := currentTimestamp()
 		header.Set(apiKeyHeader, c.apiKey)
 		header.Set(nonceHeader, nonce)
-		header.Set(signatureHeader, sign(c.apiSecret, fmt.Sprintf("/api/v2%s%s%s", path, nonce, body)))
+		header.Set(signatureHeader, sign(c.apiSecret, fmt.Sprintf("/api%s%s%s%s", r.version, path, nonce, body)))
 	}
 	// create request
-	req, err := http.NewRequestWithContext(ctx, r.method, fmt.Sprintf("%s%s", apiEndpoint, path), bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequestWithContext(ctx, r.method, fmt.Sprintf("%s%s%s", apiEndpoint, r.version, path), bytes.NewBuffer([]byte(body)))
 	if err != nil {
 		return nil, err
 	}
