@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 type Client struct {
@@ -127,4 +128,13 @@ func sign(secret, message string) string {
 	mac := hmac.New(sha512.New384, []byte(secret))
 	mac.Write([]byte(message))
 	return hex.EncodeToString(mac.Sum(nil))
+}
+
+func currentTimestamp() string {
+	return fmt.Sprintf("%d", formatTimestamp(time.Now()))
+}
+
+// formatTimestamp formats a time into Unix timestamp in milliseconds, as requested by Binance.
+func formatTimestamp(t time.Time) int64 {
+	return t.UnixNano() / int64(time.Millisecond)
 }

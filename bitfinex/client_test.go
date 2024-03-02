@@ -5,6 +5,34 @@ import (
 	"time"
 )
 
+func Test_sign(t *testing.T) {
+	type args struct {
+		secret  string
+		message string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "testcase 1",
+			args: args{
+				secret:  "secret",
+				message: "message",
+			},
+			want: "ad0ef4e80da427b2a33d4457c972bf759f50766fbb665690d50b7cb38dd5217db559c93ea7cbee48e2ae1a5b4aafd34b",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := sign(tt.args.secret, tt.args.message); got != tt.want {
+				t.Errorf("sign() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatTimestamp(t *testing.T) {
 	t.Parallel()
 
