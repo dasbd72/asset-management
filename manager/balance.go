@@ -3,7 +3,7 @@ package manager
 import (
 	"context"
 
-	"github.com/dasbd72/go-exchange-sdk/binance"
+	binanceModels "github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 	"github.com/dasbd72/go-exchange-sdk/max"
 	"github.com/dasbd72/go-exchange-sdk/okx"
 )
@@ -36,7 +36,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				sum += w.Balance.Float64()
 			}
 
-			averagePrice, err := c.binanceClient.GetAveragePrice(ctx, binance.NewGetAveragePriceRequest("BTCUSDT"))
+			averagePrice, err := c.binanceClient.GetAveragePrice(ctx, binanceModels.NewGetAveragePriceRequest("BTCUSDT"))
 			if err != nil {
 				return err
 			}

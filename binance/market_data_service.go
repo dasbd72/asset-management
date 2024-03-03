@@ -4,66 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 )
 
-type (
-	GetPingResponse struct {
-	}
-
-	GetServerTimeResponse struct {
-		ServerTime int64 `json:"serverTime"`
-	}
-
-	GetExchangeInfoResponse struct {
-		Timezone        string `json:"timezone"`
-		ServerTime      int64  `json:"serverTime"`
-		RateLimits      []interface{}
-		ExchangeFilters []interface{}
-		Symbols         []struct {
-			Symbol                          string        `json:"symbol"`
-			Status                          string        `json:"status"`
-			BaseAsset                       string        `json:"baseAsset"`
-			BaseAssetPrecision              int           `json:"baseAssetPrecision"`
-			QuoteAsset                      string        `json:"quoteAsset"`
-			QuotePrecision                  int           `json:"quotePrecision"`
-			QuoteAssetPrecision             int           `json:"quoteAssetPrecision"`
-			OrderTypes                      []string      `json:"orderTypes"`
-			IcebergAllowed                  bool          `json:"icebergAllowed"`
-			OcoAllowed                      bool          `json:"ocoAllowed"`
-			QuoteOrderQtyMarketAllowed      bool          `json:"quoteOrderQtyMarketAllowed"`
-			AllowTrailingStop               bool          `json:"allowTrailingStop"`
-			CancelReplaceAllowed            bool          `json:"cancelReplaceAllowed"`
-			IsSpotTradingAllowed            bool          `json:"isSpotTradingAllowed"`
-			IsMarginTradingAllowed          bool          `json:"isMarginTradingAllowed"`
-			Filters                         []interface{} `json:"filters"`
-			Permissions                     []string      `json:"permissions"`
-			DefaultSelfTradePreventionMode  string        `json:"defaultSelfTradePreventionMode"`
-			AllowedSelfTradePreventionModes []string      `json:"allowedSelfTradePreventionModes"`
-		}
-	}
-
-	GetOrderBookRequest struct {
-		params map[string]interface{}
-	}
-
-	GetOrderBookResponse struct {
-		LastUpdateID int64           `json:"lastUpdateId"`
-		Bids         [][]JSONFloat64 `json:"bids"`
-		Asks         [][]JSONFloat64 `json:"asks"`
-	}
-
-	GetAveragePriceRequest struct {
-		params map[string]interface{}
-	}
-
-	GetAveragePriceResponse struct {
-		Mins      int         `json:"mins"`
-		Price     JSONFloat64 `json:"price"`
-		CloseTime int64       `json:"closeTime"`
-	}
-)
-
-func (c *Client) GetPing(ctx context.Context, opts ...RequestOption) (*GetPingResponse, error) {
+func (c *Client) GetPing(ctx context.Context, opts ...RequestOption) (*models.GetPingResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/ping",
@@ -72,7 +17,7 @@ func (c *Client) GetPing(ctx context.Context, opts ...RequestOption) (*GetPingRe
 	if err != nil {
 		return nil, err
 	}
-	data := &GetPingResponse{}
+	data := &models.GetPingResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
@@ -80,7 +25,7 @@ func (c *Client) GetPing(ctx context.Context, opts ...RequestOption) (*GetPingRe
 	return data, nil
 }
 
-func (c *Client) GetServerTime(ctx context.Context, opts ...RequestOption) (*GetServerTimeResponse, error) {
+func (c *Client) GetServerTime(ctx context.Context, opts ...RequestOption) (*models.GetServerTimeResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/time",
@@ -89,7 +34,7 @@ func (c *Client) GetServerTime(ctx context.Context, opts ...RequestOption) (*Get
 	if err != nil {
 		return nil, err
 	}
-	data := &GetServerTimeResponse{}
+	data := &models.GetServerTimeResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
@@ -97,7 +42,7 @@ func (c *Client) GetServerTime(ctx context.Context, opts ...RequestOption) (*Get
 	return data, nil
 }
 
-func (c *Client) GetExchangeInfo(ctx context.Context, opts ...RequestOption) (*GetExchangeInfoResponse, error) {
+func (c *Client) GetExchangeInfo(ctx context.Context, opts ...RequestOption) (*models.GetExchangeInfoResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/exchangeInfo",
@@ -106,7 +51,7 @@ func (c *Client) GetExchangeInfo(ctx context.Context, opts ...RequestOption) (*G
 	if err != nil {
 		return nil, err
 	}
-	data := &GetExchangeInfoResponse{}
+	data := &models.GetExchangeInfoResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
@@ -114,25 +59,17 @@ func (c *Client) GetExchangeInfo(ctx context.Context, opts ...RequestOption) (*G
 	return data, nil
 }
 
-func NewGetOrderBookRequest(symbol string) *GetOrderBookRequest {
-	return &GetOrderBookRequest{
-		params: map[string]interface{}{
-			"symbol": symbol,
-		},
-	}
-}
-
-func (c *Client) GetOrderBook(ctx context.Context, req *GetOrderBookRequest, opts ...RequestOption) (*GetOrderBookResponse, error) {
+func (c *Client) GetOrderBook(ctx context.Context, req *models.GetOrderBookRequest, opts ...RequestOption) (*models.GetOrderBookResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/depth",
 		SecType:  SecTypeNone,
-		Params:   req.params,
+		Params:   req.Params(),
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
 	}
-	data := &GetOrderBookResponse{}
+	data := &models.GetOrderBookResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
@@ -140,25 +77,17 @@ func (c *Client) GetOrderBook(ctx context.Context, req *GetOrderBookRequest, opt
 	return data, nil
 }
 
-func NewGetAveragePriceRequest(symbol string) *GetAveragePriceRequest {
-	return &GetAveragePriceRequest{
-		params: map[string]interface{}{
-			"symbol": symbol,
-		},
-	}
-}
-
-func (c *Client) GetAveragePrice(ctx context.Context, req *GetAveragePriceRequest, opts ...RequestOption) (*GetAveragePriceResponse, error) {
+func (c *Client) GetAveragePrice(ctx context.Context, req *models.GetAveragePriceRequest, opts ...RequestOption) (*models.GetAveragePriceResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/api/v3/avgPrice",
 		SecType:  SecTypeNone,
-		Params:   req.params,
+		Params:   req.Params(),
 	}.Build(), opts...)
 	if err != nil {
 		return nil, err
 	}
-	data := &GetAveragePriceResponse{}
+	data := &models.GetAveragePriceResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err

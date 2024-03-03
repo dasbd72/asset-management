@@ -1,4 +1,4 @@
-package binance
+package cast
 
 import (
 	"strconv"

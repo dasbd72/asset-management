@@ -4,22 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 )
 
-type (
-	GetWalletStatusResponse struct {
-		Status int    `json:"status"`
-		Msg    string `json:"msg"`
-	}
-
-	GetUserWalletBalanceResponse []struct {
-		Activate   bool        `json:"activate"`
-		Balance    JSONFloat64 `json:"balance"` // in BTC
-		WalletName string      `json:"walletName"`
-	}
-)
-
-func (c *Client) GetWalletStatus(ctx context.Context, opts ...RequestOption) (*GetWalletStatusResponse, error) {
+func (c *Client) GetWalletStatus(ctx context.Context, opts ...RequestOption) (*models.GetWalletStatusResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/sapi/v1/system/status",
@@ -28,7 +17,7 @@ func (c *Client) GetWalletStatus(ctx context.Context, opts ...RequestOption) (*G
 	if err != nil {
 		return nil, err
 	}
-	data := &GetWalletStatusResponse{}
+	data := &models.GetWalletStatusResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
@@ -36,7 +25,7 @@ func (c *Client) GetWalletStatus(ctx context.Context, opts ...RequestOption) (*G
 	return data, nil
 }
 
-func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption) (*GetUserWalletBalanceResponse, error) {
+func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption) (*models.GetUserWalletBalanceResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/sapi/v1/asset/wallet/balance",
@@ -45,7 +34,7 @@ func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption
 	if err != nil {
 		return nil, err
 	}
-	data := &GetUserWalletBalanceResponse{}
+	data := &models.GetUserWalletBalanceResponse{}
 	err = json.Unmarshal(res, data)
 	if err != nil {
 		return nil, err
