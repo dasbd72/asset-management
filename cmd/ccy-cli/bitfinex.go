@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/rest"
+	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/rest"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/cobra"
 )

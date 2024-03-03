@@ -6,7 +6,7 @@ import (
 	"os"
 
 	binanceSpot "github.com/dasbd72/go-exchange-sdk/binance/pkg/spot"
-	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/rest"
+	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/rest"
 	"github.com/dasbd72/go-exchange-sdk/manager"
 	"github.com/dasbd72/go-exchange-sdk/max"
 	"github.com/dasbd72/go-exchange-sdk/okx"

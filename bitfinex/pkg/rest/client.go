@@ -1,4 +1,4 @@
-package bitfinexRest
+package rest
 
 import (
 	"bytes"
