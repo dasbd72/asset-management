@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dasbd72/go-exchange-sdk/binance"
+	binanceSpot "github.com/dasbd72/go-exchange-sdk/binance/pkg/spot"
 	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/rest"
 	"github.com/dasbd72/go-exchange-sdk/manager"
 	"github.com/dasbd72/go-exchange-sdk/max"
@@ -37,7 +37,7 @@ func Balance(cmd *cobra.Command, args []string) error {
 	}
 
 	c := manager.Client_builder{
-		BinanceClient:      binance.NewClient(binanceApiKey, binanceApiSecret),
+		BinanceClient:      binanceSpot.NewClient(binanceApiKey, binanceApiSecret),
 		OkxClient:          okx.NewClient(okxApiKey, okxApiSecret, okxPassphrase),
 		BitfinexRestClient: bitfinexRest.NewClient(bitfinexApiKey, bitfinexApiSecret),
 	}.Build()

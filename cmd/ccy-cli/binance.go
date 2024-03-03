@@ -6,21 +6,20 @@ import (
 	"log"
 	"os"
 
-	"github.com/dasbd72/go-exchange-sdk/binance"
+	binanceSpot "github.com/dasbd72/go-exchange-sdk/binance/pkg/spot"
 	"github.com/spf13/cobra"
 )
 
 func Binance(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	// Create a new Binance client
-	c := binance.NewClient(
+	c := binanceSpot.NewClient(
 		os.Getenv("BINANCE_API_KEY"),
 		os.Getenv("BINANCE_API_SECRET"),
 	)
 
 	// Start testing
 	data, err := c.GetUserWalletBalance(ctx)
-	// data, err := c.GetOrderBook(ctx, binance.NewGetOrderBookRequest("BTCUSDT"))
 	if err != nil {
 		log.Fatal(err)
 	}

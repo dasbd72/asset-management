@@ -1,19 +1,19 @@
 package manager
 
 import (
-	"github.com/dasbd72/go-exchange-sdk/binance"
+	binanceRest "github.com/dasbd72/go-exchange-sdk/binance/pkg/spot"
 	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/rest"
 	"github.com/dasbd72/go-exchange-sdk/okx"
 )
 
 type Client struct {
-	binanceClient      *binance.Client
+	binanceClient      *binanceRest.Client
 	okxClient          *okx.Client
 	bitfinexRestClient *bitfinexRest.Client
 }
 
 type Client_builder struct {
-	BinanceClient      *binance.Client
+	BinanceClient      *binanceRest.Client
 	OkxClient          *okx.Client
 	BitfinexRestClient *bitfinexRest.Client
 }
