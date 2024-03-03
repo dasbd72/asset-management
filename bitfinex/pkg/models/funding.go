@@ -122,13 +122,13 @@ func (data *FundingOffer) fromIf(v []interface{}) {
 	data.Amount = cast.IfToNilOrFloat64(v[4])
 	data.AmountOrig = cast.IfToNilOrFloat64(v[5])
 	data.Type = cast.IfToNilOrString(v[6])
-	data.Flags = v[7]
-	data.Status = cast.IfToNilOrString(v[8])
-	data.Rate = cast.IfToNilOrFloat64(v[9])
-	data.Period = cast.IfToNilOrInt(v[10])
-	data.Notify = cast.IfToNilOrInt(v[11])
-	data.Hidden = cast.IfToNilOrInt(v[12])
-	data.Renew = cast.IfToNilOrInt(v[13])
+	data.Flags = v[9]
+	data.Status = cast.IfToNilOrString(v[10])
+	data.Rate = cast.IfToNilOrFloat64(v[14])
+	data.Period = cast.IfToNilOrInt(v[15])
+	data.Notify = cast.IfToNilOrInt(v[16])
+	data.Hidden = cast.IfToNilOrInt(v[17])
+	data.Renew = cast.IfToNilOrInt(v[19])
 }
 
 func (data *FundingInfo) FromRaw(raw []byte) error {
