@@ -98,7 +98,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			if err != nil {
 				return err
 			}
-			for _, w := range res.Wallet {
+			for _, w := range res.Wallets {
 				if w.Currency.String() == "USD" || w.Currency.String() == "UST" {
 					sum += w.Balance.Float64()
 				}
