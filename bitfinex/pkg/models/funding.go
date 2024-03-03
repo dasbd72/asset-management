@@ -41,6 +41,22 @@ type (
 		Renew      cast.NilOrInt     `json:"renew"`
 	}
 
+	FRRType string
+
+	SubmitFundingOfferRequest struct {
+		params map[string]interface{}
+	}
+
+	SubmitFundingOfferResponse struct {
+		MTS           cast.NilOrInt    `json:"mts"`
+		Type          cast.NilOrString `json:"type"`
+		MessageID     cast.NilOrInt    `json:"messageID"`
+		FundingOffers []FundingOffer   `json:"funding_offer_array"`
+		Code          cast.NilOrInt    `json:"code"`
+		Status        cast.NilOrString `json:"status"`
+		Text          cast.NilOrString `json:"text"`
+	}
+
 	FundingInfo struct {
 		Symbol       cast.NilOrString  `json:"symbol"`
 		YieldLoan    cast.NilOrFloat64 `json:"yield_loan"`
@@ -48,6 +64,12 @@ type (
 		DurationLoan cast.NilOrFloat64 `json:"duration_loan"`
 		DurationLend cast.NilOrFloat64 `json:"duration_lend"`
 	}
+)
+
+const (
+	FRRLIMIT    FRRType = "LIMIT"       // Place an order at an explicit, static rate
+	FRRDELTAFIX FRRType = "FRRDELTAFIX" // Place an order at the Flash Return Rate (FRR)
+	FRRDELTAVAR FRRType = "FRRDELTAVAR" // Place an order at an implicit, dynamic rate, relative to the FRR
 )
 
 func (data *FundingStats) FromRaw(raw []byte) error {
@@ -129,6 +151,52 @@ func (data *FundingOffer) fromIf(v []interface{}) {
 	data.Notify = cast.IfToNilOrInt(v[16])
 	data.Hidden = cast.IfToNilOrInt(v[17])
 	data.Renew = cast.IfToNilOrInt(v[19])
+}
+
+func NewSubmitFundingOfferRequest(frrType FRRType, symbol string, amount string, rate string, period int) *SubmitFundingOfferRequest {
+	return &SubmitFundingOfferRequest{
+		params: map[string]interface{}{
+			"type":   frrType,
+			"symbol": symbol,
+			"amount": amount,
+			"rate":   rate,
+			"period": period,
+		},
+	}
+}
+
+func (data *SubmitFundingOfferRequest) Flag(flag int) *SubmitFundingOfferRequest {
+	data.params["flags"] = flag
+	return data
+}
+
+func (data *SubmitFundingOfferRequest) Params() map[string]interface{} {
+	return data.params
+}
+
+func (data *SubmitFundingOfferResponse) FromRaw(raw []byte) error {
+	container := []interface{}{}
+	err := json.Unmarshal(raw, &container)
+	if err != nil {
+		return err
+	}
+	data.fromIf(container)
+	return nil
+}
+
+func (data *SubmitFundingOfferResponse) fromIf(v []interface{}) {
+	data.MTS = cast.IfToNilOrInt(v[0])
+	data.Type = cast.IfToNilOrString(v[1])
+	data.MessageID = cast.IfToNilOrInt(v[2])
+	data.FundingOffers = []FundingOffer{}
+	for _, vv := range v[4].([]interface{}) {
+		fundingOffer := FundingOffer{}
+		fundingOffer.fromIf(vv.([]interface{}))
+		data.FundingOffers = append(data.FundingOffers, fundingOffer)
+	}
+	data.Code = cast.IfToNilOrInt(v[5])
+	data.Status = cast.IfToNilOrString(v[6])
+	data.Text = cast.IfToNilOrString(v[7])
 }
 
 func (data *FundingInfo) FromRaw(raw []byte) error {

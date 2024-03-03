@@ -44,6 +44,25 @@ func (c *Client) GetActiveFundingOffers(ctx context.Context, symbol string, opts
 	return data, nil
 }
 
+func (c *Client) SubmitFundingOffer(ctx context.Context, req *models.SubmitFundingOfferRequest, opts ...RequestOption) (*models.FundingOffer, error) {
+	res, err := c.CallAPI(ctx, Request_builder{
+		Method:   http.MethodPost,
+		Endpoint: "/auth/w/funding/offer/submit",
+		Version:  Version2,
+		SecType:  SecTypePrivate,
+		Params:   req.Params(),
+	}.Build(), opts...)
+	if err != nil {
+		return nil, err
+	}
+	data := &models.FundingOffer{}
+	err = data.FromRaw(res)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 func (c *Client) GetFundingOffersHistory(ctx context.Context, symbol string, opts ...RequestOption) (*models.FundingOffers, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodPost,
