@@ -41,13 +41,7 @@ type (
 		Renew      cast.NilOrInt     `json:"renew"`
 	}
 
-	FRRType string
-
-	SubmitFundingOfferRequest struct {
-		params map[string]interface{}
-	}
-
-	SubmitFundingOfferResponse struct {
+	FundingOffersWriteResponse struct {
 		MTS           cast.NilOrInt    `json:"mts"`
 		Type          cast.NilOrString `json:"type"`
 		MessageID     cast.NilOrInt    `json:"messageID"`
@@ -55,6 +49,31 @@ type (
 		Code          cast.NilOrInt    `json:"code"`
 		Status        cast.NilOrString `json:"status"`
 		Text          cast.NilOrString `json:"text"`
+	}
+
+	FRRType string
+
+	SubmitFundingOfferRequest struct {
+		params map[string]interface{}
+	}
+
+	SubmitFundingOfferResponse = FundingOffersWriteResponse
+
+	CancelFundingOfferRequest struct {
+		params map[string]interface{}
+	}
+
+	CancelFundingOfferResponse = FundingOffersWriteResponse
+
+	CancelAllFundingOfferRequest struct {
+		params map[string]interface{}
+	}
+
+	CancelAllFundingOfferResponse struct {
+		MTS    cast.NilOrInt    `json:"mts"`
+		Type   cast.NilOrString `json:"type"`
+		Status cast.NilOrString `json:"status"`
+		Text   cast.NilOrString `json:"text"`
 	}
 
 	FundingInfo struct {
@@ -73,7 +92,7 @@ const (
 )
 
 func (data *FundingStats) FromRaw(raw []byte) error {
-	container := [][]interface{}{}
+	container := []interface{}{}
 	err := json.Unmarshal(raw, &container)
 	if err != nil {
 		return err
@@ -82,10 +101,10 @@ func (data *FundingStats) FromRaw(raw []byte) error {
 	return nil
 }
 
-func (data *FundingStats) fromIf(v [][]interface{}) {
+func (data *FundingStats) fromIf(v []interface{}) {
 	for _, vv := range v {
 		fundingStat := FundingStat{}
-		fundingStat.fromIf(vv)
+		fundingStat.fromIf(vv.([]interface{}))
 	}
 }
 
@@ -109,7 +128,7 @@ func (data *FundingStat) fromIf(v []interface{}) {
 }
 
 func (data *FundingOffers) FromRaw(raw []byte) error {
-	container := [][]interface{}{}
+	container := []interface{}{}
 	err := json.Unmarshal(raw, &container)
 	if err != nil {
 		return err
@@ -118,10 +137,10 @@ func (data *FundingOffers) FromRaw(raw []byte) error {
 	return nil
 }
 
-func (data *FundingOffers) fromIf(v [][]interface{}) {
+func (data *FundingOffers) fromIf(v []interface{}) {
 	for _, vv := range v {
 		fundingOffer := FundingOffer{}
-		fundingOffer.fromIf(vv)
+		fundingOffer.fromIf(vv.([]interface{}))
 		data.FundingOffers = append(data.FundingOffers, fundingOffer)
 	}
 }
@@ -174,7 +193,7 @@ func (data *SubmitFundingOfferRequest) Params() map[string]interface{} {
 	return data.params
 }
 
-func (data *SubmitFundingOfferResponse) FromRaw(raw []byte) error {
+func (data *FundingOffersWriteResponse) FromRaw(raw []byte) error {
 	container := []interface{}{}
 	err := json.Unmarshal(raw, &container)
 	if err != nil {
@@ -184,7 +203,7 @@ func (data *SubmitFundingOfferResponse) FromRaw(raw []byte) error {
 	return nil
 }
 
-func (data *SubmitFundingOfferResponse) fromIf(v []interface{}) {
+func (data *FundingOffersWriteResponse) fromIf(v []interface{}) {
 	data.MTS = cast.IfToNilOrInt(v[0])
 	data.Type = cast.IfToNilOrString(v[1])
 	data.MessageID = cast.IfToNilOrInt(v[2])
@@ -195,6 +214,50 @@ func (data *SubmitFundingOfferResponse) fromIf(v []interface{}) {
 		data.FundingOffers = append(data.FundingOffers, fundingOffer)
 	}
 	data.Code = cast.IfToNilOrInt(v[5])
+	data.Status = cast.IfToNilOrString(v[6])
+	data.Text = cast.IfToNilOrString(v[7])
+}
+
+func NewCancelFundingOfferRequest(id int) *CancelFundingOfferRequest {
+	return &CancelFundingOfferRequest{
+		params: map[string]interface{}{
+			"id": id,
+		},
+	}
+}
+
+func (data *CancelFundingOfferRequest) Params() map[string]interface{} {
+	return data.params
+}
+
+func NewCancelAllFundingOfferRequest() *CancelAllFundingOfferRequest {
+	return &CancelAllFundingOfferRequest{
+		params: map[string]interface{}{},
+	}
+}
+
+func (data *CancelAllFundingOfferRequest) Currency(currency string) *CancelAllFundingOfferRequest {
+	data.params["currency"] = currency
+	return data
+}
+
+func (data *CancelAllFundingOfferRequest) Params() map[string]interface{} {
+	return data.params
+}
+
+func (data *CancelAllFundingOfferResponse) FromRaw(raw []byte) error {
+	container := []interface{}{}
+	err := json.Unmarshal(raw, &container)
+	if err != nil {
+		return err
+	}
+	data.fromIf(container)
+	return nil
+}
+
+func (data *CancelAllFundingOfferResponse) fromIf(v []interface{}) {
+	data.MTS = cast.IfToNilOrInt(v[0])
+	data.Type = cast.IfToNilOrString(v[1])
 	data.Status = cast.IfToNilOrString(v[6])
 	data.Text = cast.IfToNilOrString(v[7])
 }

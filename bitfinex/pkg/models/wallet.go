@@ -23,7 +23,7 @@ type (
 )
 
 func (data *Wallets) FromRaw(raw []byte) error {
-	container := [][]interface{}{}
+	container := []interface{}{}
 	err := json.Unmarshal(raw, &container)
 	if err != nil {
 		return err
@@ -32,10 +32,10 @@ func (data *Wallets) FromRaw(raw []byte) error {
 	return nil
 }
 
-func (data *Wallets) fromIf(v [][]interface{}) {
+func (data *Wallets) fromIf(v []interface{}) {
 	for _, vv := range v {
 		wallet := Wallet{}
-		wallet.fromIf(vv)
+		wallet.fromIf(vv.([]interface{}))
 		data.Wallets = append(data.Wallets, wallet)
 	}
 }
