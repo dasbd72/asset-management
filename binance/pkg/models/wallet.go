@@ -8,7 +8,7 @@ type (
 		Msg    string `json:"msg"`
 	}
 
-	GetUserWalletBalanceResponse []struct {
+	GetUserWalletBalanceResponse struct {
 		Activate   bool             `json:"activate"`
 		Balance    cast.JSONFloat64 `json:"balance"` // in BTC
 		WalletName string           `json:"walletName"`

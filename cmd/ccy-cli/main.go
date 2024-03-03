@@ -26,11 +26,6 @@ func main() {
 		Short: "OKX commands",
 		Run:   OKX,
 	}
-	binanceCmd := &cobra.Command{
-		Use:   "binance",
-		Short: "Binance commands",
-		Run:   Binance,
-	}
 	maxCmd := &cobra.Command{
 		Use:   "max",
 		Short: "Max commands",
@@ -48,7 +43,6 @@ func main() {
 	}
 	root.PersistentFlags().BoolVarP(&useLog, "log", "l", false, "Use log")
 	root.AddCommand(okxCmd)
-	root.AddCommand(binanceCmd)
 	root.AddCommand(maxCmd)
 	root.AddCommand(bitfinexCmd)
 	root.AddCommand(balanceCmd)

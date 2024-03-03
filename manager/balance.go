@@ -32,7 +32,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			if err != nil {
 				return err
 			}
-			for _, w := range *wallet {
+			for _, w := range wallet {
 				sum += w.Balance.Float64()
 			}
 

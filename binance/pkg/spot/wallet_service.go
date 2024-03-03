@@ -25,7 +25,7 @@ func (c *Client) GetWalletStatus(ctx context.Context, opts ...RequestOption) (*m
 	return data, nil
 }
 
-func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption) (*models.GetUserWalletBalanceResponse, error) {
+func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption) ([]models.GetUserWalletBalanceResponse, error) {
 	res, err := c.CallAPI(ctx, Request_builder{
 		Method:   http.MethodGet,
 		Endpoint: "/sapi/v1/asset/wallet/balance",
@@ -34,8 +34,8 @@ func (c *Client) GetUserWalletBalance(ctx context.Context, opts ...RequestOption
 	if err != nil {
 		return nil, err
 	}
-	data := &models.GetUserWalletBalanceResponse{}
-	err = json.Unmarshal(res, data)
+	data := []models.GetUserWalletBalanceResponse{}
+	err = json.Unmarshal(res, &data)
 	if err != nil {
 		return nil, err
 	}
