@@ -40,6 +40,14 @@ type (
 		Hidden     cast.NilOrInt     `json:"hidden"`
 		Renew      cast.NilOrInt     `json:"renew"`
 	}
+
+	FundingInfo struct {
+		Symbol       cast.NilOrString  `json:"symbol"`
+		YieldLoan    cast.NilOrFloat64 `json:"yield_loan"`
+		YieldLend    cast.NilOrFloat64 `json:"yield_lend"`
+		DurationLoan cast.NilOrFloat64 `json:"duration_loan"`
+		DurationLend cast.NilOrFloat64 `json:"duration_lend"`
+	}
 )
 
 func (data *FundingStats) FromRaw(raw []byte) error {
@@ -121,4 +129,22 @@ func (data *FundingOffer) fromIf(v []interface{}) {
 	data.Notify = cast.IfToNilOrInt(v[11])
 	data.Hidden = cast.IfToNilOrInt(v[12])
 	data.Renew = cast.IfToNilOrInt(v[13])
+}
+
+func (data *FundingInfo) FromRaw(raw []byte) error {
+	container := []interface{}{}
+	err := json.Unmarshal(raw, &container)
+	if err != nil {
+		return err
+	}
+	data.fromIf(container)
+	return nil
+}
+
+func (data *FundingInfo) fromIf(v []interface{}) {
+	data.Symbol = cast.IfToNilOrString(v[1])
+	data.YieldLoan = cast.IfToNilOrFloat64(v[2].([]interface{})[0])
+	data.YieldLend = cast.IfToNilOrFloat64(v[2].([]interface{})[1])
+	data.DurationLoan = cast.IfToNilOrFloat64(v[2].([]interface{})[2])
+	data.DurationLend = cast.IfToNilOrFloat64(v[2].([]interface{})[3])
 }
