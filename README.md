@@ -26,6 +26,8 @@ OKX_API_KEY=your-api-key
 OKX_API_SECRET=your-api-secret
 PIONEX_API_KEY=your-api-key
 PIONEX_API_SECRET=your-api-secret
+BFX_API_KEY=your-api-key
+BFX_API_SECRET=your-api-secret
 ```
 
 ## References
