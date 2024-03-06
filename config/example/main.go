@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err)
+	}
 	b, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		panic(err)

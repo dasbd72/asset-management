@@ -19,14 +19,14 @@ type Config struct {
 	PionexApiSecret   string
 }
 
-func Load() *Config {
+func Load() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	err = godotenv.Load(path.Join(os.Getenv("HOME"), ".ccyrc"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return &Config{
@@ -39,5 +39,5 @@ func Load() *Config {
 		BitfinexApiSecret: os.Getenv("BFX_API_SECRET"),
 		PionexApiKey:      os.Getenv("PIONEX_API_KEY"),
 		PionexApiSecret:   os.Getenv("PIONEX_API_SECRET"),
-	}
+	}, nil
 }
