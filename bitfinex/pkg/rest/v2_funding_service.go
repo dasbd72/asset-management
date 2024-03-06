@@ -147,7 +147,6 @@ func (c *Client) GetFundingInfo(ctx context.Context, symbol string, opts ...Requ
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(res))
 	data := &models.FundingInfo{}
 	err = data.FromRaw(res)
 	if err != nil {

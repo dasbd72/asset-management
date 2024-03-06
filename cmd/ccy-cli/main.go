@@ -31,11 +31,6 @@ func main() {
 		Short: "Max commands",
 		Run:   Max,
 	}
-	bitfinexCmd := &cobra.Command{
-		Use:   "bitfinex",
-		Short: "Bitfinex commands",
-		Run:   Bitfinex,
-	}
 	balanceCmd := &cobra.Command{
 		Use:   "balance",
 		Short: "Get balance",
@@ -44,7 +39,6 @@ func main() {
 	root.PersistentFlags().BoolVarP(&useLog, "log", "l", false, "Use log")
 	root.AddCommand(okxCmd)
 	root.AddCommand(maxCmd)
-	root.AddCommand(bitfinexCmd)
 	root.AddCommand(balanceCmd)
 	root.Execute()
 }

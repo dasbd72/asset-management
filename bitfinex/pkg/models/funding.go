@@ -42,13 +42,13 @@ type (
 	}
 
 	FundingOffersWriteResponse struct {
-		MTS           cast.NilOrInt    `json:"mts"`
-		Type          cast.NilOrString `json:"type"`
-		MessageID     cast.NilOrInt    `json:"messageID"`
-		FundingOffers []FundingOffer   `json:"funding_offer_array"`
-		Code          cast.NilOrInt    `json:"code"`
-		Status        cast.NilOrString `json:"status"`
-		Text          cast.NilOrString `json:"text"`
+		MTS          cast.NilOrInt    `json:"mts"`
+		Type         cast.NilOrString `json:"type"`
+		MessageID    cast.NilOrInt    `json:"messageID"`
+		FundingOffer FundingOffer     `json:"funding_offer_array"`
+		Code         cast.NilOrInt    `json:"code"`
+		Status       cast.NilOrString `json:"status"`
+		Text         cast.NilOrString `json:"text"`
 	}
 
 	FRRType string
@@ -163,7 +163,7 @@ func (data *FundingOffer) fromIf(v []interface{}) {
 	data.Amount = cast.IfToNilOrFloat64(v[4])
 	data.AmountOrig = cast.IfToNilOrFloat64(v[5])
 	data.Type = cast.IfToNilOrString(v[6])
-	data.Flags = v[9]
+	data.Flags = cast.IfToNilOrInt(v[9])
 	data.Status = cast.IfToNilOrString(v[10])
 	data.Rate = cast.IfToNilOrFloat64(v[14])
 	data.Period = cast.IfToNilOrInt(v[15])
@@ -207,12 +207,7 @@ func (data *FundingOffersWriteResponse) fromIf(v []interface{}) {
 	data.MTS = cast.IfToNilOrInt(v[0])
 	data.Type = cast.IfToNilOrString(v[1])
 	data.MessageID = cast.IfToNilOrInt(v[2])
-	data.FundingOffers = []FundingOffer{}
-	for _, vv := range v[4].([]interface{}) {
-		fundingOffer := FundingOffer{}
-		fundingOffer.fromIf(vv.([]interface{}))
-		data.FundingOffers = append(data.FundingOffers, fundingOffer)
-	}
+	data.FundingOffer.fromIf(v[4].([]interface{}))
 	data.Code = cast.IfToNilOrInt(v[5])
 	data.Status = cast.IfToNilOrString(v[6])
 	data.Text = cast.IfToNilOrString(v[7])
@@ -236,6 +231,9 @@ func NewCancelAllFundingOfferRequest() *CancelAllFundingOfferRequest {
 	}
 }
 
+// Currency sets the currency for the request
+//
+// Example: "USD", "UST", "BTC"
 func (data *CancelAllFundingOfferRequest) Currency(currency string) *CancelAllFundingOfferRequest {
 	data.params["currency"] = currency
 	return data
