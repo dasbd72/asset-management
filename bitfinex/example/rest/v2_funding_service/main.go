@@ -6,9 +6,9 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/dasbd72/go-exchange-sdk/bitfinex/example/config"
 	"github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/models"
 	"github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/rest"
+	"github.com/dasbd72/go-exchange-sdk/config"
 )
 
 var (
@@ -27,7 +27,10 @@ func init() {
 }
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err)
+	}
 
 	ctx := context.Background()
 	c := rest.NewClient(cfg.BitfinexApiKey, cfg.BitfinexApiSecret)
