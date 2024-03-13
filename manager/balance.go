@@ -65,7 +65,15 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				return err
 			}
 			for _, f := range funding.Balances {
-				sum += f.Bal.Float64()
+				price := 1.0
+				if f.Ccy != "USDT" {
+					ticker, err := c.okxClient.GetTicker(ctx, okx.NewGetTickerRequest(f.Ccy+"-USDT"))
+					if err != nil {
+						return err
+					}
+					price = ticker.Tickers[0].Last.Float64()
+				}
+				sum += f.Bal.Float64() * price
 			}
 			// Get balance from saving
 			savings, err := c.okxClient.GetSavingBalance(ctx, okx.NewGetSavingBalanceRequest())
@@ -83,7 +91,6 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				}
 				sum += s.Amt.Float64() * price
 			}
-
 			totalBalanceUsdt += sum
 			return nil
 		},
