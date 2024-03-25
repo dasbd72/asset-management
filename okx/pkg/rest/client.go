@@ -1,4 +1,4 @@
-package okx
+package rest
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const (
@@ -129,4 +130,13 @@ func sign(secret, message string) string {
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(message))
 	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
+
+func currentTimestamp() string {
+	return formatTimestamp(time.Now().UTC())
+}
+
+// formatTimestamp formats a time into string.
+func formatTimestamp(t time.Time) string {
+	return t.Format("2006-01-02T15:04:05.999Z07:00")
 }

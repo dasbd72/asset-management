@@ -1,4 +1,4 @@
-package okx
+package cast
 
 import (
 	"strconv"
@@ -10,11 +10,6 @@ type (
 	JSONFloat64 float64
 	JSONInt64   int64
 	JSONTime    time.Time
-
-	BasicResponse struct {
-		Code JSONInt64 `json:"code"`
-		Msg  string    `json:"msg"`
-	}
 )
 
 func (t *JSONFloat64) Float64() float64 { return float64(*t) }

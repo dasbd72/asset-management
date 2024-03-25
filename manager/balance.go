@@ -2,10 +2,11 @@ package manager
 
 import (
 	"context"
+	"fmt"
 
 	binanceModels "github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 	"github.com/dasbd72/go-exchange-sdk/max"
-	"github.com/dasbd72/go-exchange-sdk/okx"
+	okxModels "github.com/dasbd72/go-exchange-sdk/okx/pkg/models"
 )
 
 type (
@@ -43,6 +44,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			btcPrice := averagePrice.Price.Float64()
 
 			totalBalanceUsdt += sum * btcPrice
+			fmt.Println("Binance balance: ", sum*btcPrice)
 			return nil
 		},
 		func() error {
@@ -52,22 +54,32 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			}
 			sum := 0.0
 			// Get balance from wallet
-			wallet, err := c.okxClient.GetBalance(ctx, okx.NewGetBalanceRequest())
+			wallet, err := c.okxClient.GetBalance(ctx, okxModels.NewGetBalanceRequest())
 			if err != nil {
 				return err
 			}
 			for _, w := range wallet.Balances {
-				sum += w.TotalEq.Float64()
+				for _, detail := range w.Details {
+					price := 1.0
+					if detail.Ccy != "USDT" {
+						ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(detail.Ccy+"-USDT"))
+						if err != nil {
+							return err
+						}
+						price = ticker.Tickers[0].Last.Float64()
+					}
+					sum += detail.Eq.Float64() * price
+				}
 			}
 			// Get balance from funding
-			funding, err := c.okxClient.GetFundingBalances(ctx, okx.NewGetFundingBalancesRequest())
+			funding, err := c.okxClient.GetFundingBalances(ctx, okxModels.NewGetFundingBalancesRequest())
 			if err != nil {
 				return err
 			}
 			for _, f := range funding.Balances {
 				price := 1.0
 				if f.Ccy != "USDT" {
-					ticker, err := c.okxClient.GetTicker(ctx, okx.NewGetTickerRequest(f.Ccy+"-USDT"))
+					ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(f.Ccy+"-USDT"))
 					if err != nil {
 						return err
 					}
@@ -76,14 +88,14 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				sum += f.Bal.Float64() * price
 			}
 			// Get balance from saving
-			savings, err := c.okxClient.GetSavingBalance(ctx, okx.NewGetSavingBalanceRequest())
+			savings, err := c.okxClient.GetSavingBalance(ctx, okxModels.NewGetSavingBalanceRequest())
 			if err != nil {
 				return err
 			}
 			for _, s := range savings.Balances {
 				price := 1.0
 				if s.Ccy != "USDT" {
-					ticker, err := c.okxClient.GetTicker(ctx, okx.NewGetTickerRequest(s.Ccy+"-USDT"))
+					ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(s.Ccy+"-USDT"))
 					if err != nil {
 						return err
 					}
@@ -92,6 +104,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				sum += s.Amt.Float64() * price
 			}
 			totalBalanceUsdt += sum
+			fmt.Println("OKX balance: ", sum)
 			return nil
 		},
 		func() error {
@@ -112,6 +125,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			}
 
 			totalBalanceUsdt += sum
+			fmt.Println("Bitfinex balance: ", sum)
 			return nil
 		},
 		func() error {

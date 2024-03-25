@@ -21,11 +21,6 @@ func main() {
 		Use:   "experimental",
 		Short: "Experimental commands",
 	}
-	okxCmd := &cobra.Command{
-		Use:   "okx",
-		Short: "OKX commands",
-		Run:   OKX,
-	}
 	maxCmd := &cobra.Command{
 		Use:   "max",
 		Short: "Max commands",
@@ -37,7 +32,6 @@ func main() {
 		RunE:  Balance,
 	}
 	root.PersistentFlags().BoolVarP(&useLog, "log", "l", false, "Use log")
-	root.AddCommand(okxCmd)
 	root.AddCommand(maxCmd)
 	root.AddCommand(balanceCmd)
 	root.Execute()

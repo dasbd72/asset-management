@@ -1,4 +1,4 @@
-package okx
+package rest
 
 import (
 	"testing"
@@ -6,6 +6,34 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 )
+
+func Test_sign(t *testing.T) {
+	type args struct {
+		secret  string
+		message string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "testcase 1",
+			args: args{
+				secret:  "secret",
+				message: "message",
+			},
+			want: "i19IcCmVwVmMVz2x4hhmqbgl1KeU0WnXBgoDYFeWNgs=",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := sign(tt.args.secret, tt.args.message); got != tt.want {
+				t.Errorf("sign() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestFormatTimestamp(t *testing.T) {
 	tpe, err := time.LoadLocation("Asia/Taipei")

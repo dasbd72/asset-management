@@ -9,7 +9,7 @@ import (
 	"github.com/dasbd72/go-exchange-sdk/config"
 	"github.com/dasbd72/go-exchange-sdk/manager"
 	"github.com/dasbd72/go-exchange-sdk/max"
-	"github.com/dasbd72/go-exchange-sdk/okx"
+	okxRest "github.com/dasbd72/go-exchange-sdk/okx/pkg/rest"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func Balance(cmd *cobra.Command, args []string) error {
 
 	c := manager.Client_builder{
 		BinanceClient:      binanceSpot.NewClient(cfg.BinanceApiKey, cfg.BinanceApiSecret),
-		OkxClient:          okx.NewClient(cfg.OKXApiKey, cfg.OKXApiSecret, cfg.OKXPassphrase),
+		OkxClient:          okxRest.NewClient(cfg.OKXApiKey, cfg.OKXApiSecret, cfg.OKXPassphrase),
 		BitfinexRestClient: bitfinexRest.NewClient(cfg.BitfinexApiKey, cfg.BitfinexApiSecret),
 	}.Build()
 
