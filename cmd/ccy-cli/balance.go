@@ -8,7 +8,6 @@ import (
 	bitfinexRest "github.com/dasbd72/go-exchange-sdk/bitfinex/pkg/rest"
 	"github.com/dasbd72/go-exchange-sdk/config"
 	"github.com/dasbd72/go-exchange-sdk/manager"
-	"github.com/dasbd72/go-exchange-sdk/max"
 	okxRest "github.com/dasbd72/go-exchange-sdk/okx/pkg/rest"
 	"github.com/spf13/cobra"
 )
@@ -37,16 +36,35 @@ func Balance(cmd *cobra.Command, args []string) error {
 		BitfinexRestClient: bitfinexRest.NewClient(cfg.BitfinexApiKey, cfg.BitfinexApiSecret),
 	}.Build()
 
-	balance, err := c.GetBalance(ctx)
+	// Get balance
+	balanceUsdt := 0.0
+	balanceTwd := 0.0
+	// Get Binance balance
+	binanceBalance, err := c.GetBinanceBalance(ctx)
 	if err != nil {
 		return err
 	}
-	usdtToTWD, err := max.GetUsdtToTWD()
+	balanceUsdt += binanceBalance
+	// Get OKX balance
+	okxBalance, err := c.GetOkxBalance(ctx)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Total balance: %10.2f USDT\n", balance.Usdt)
-	fmt.Printf("Total balance: %10.2f TWD\n", balance.Twd)
+	balanceUsdt += okxBalance
+	// Get Bitfinex balance
+	bitfinexBalance, err := c.GetBitfinexBalance(ctx)
+	if err != nil {
+		return err
+	}
+	balanceUsdt += bitfinexBalance
+	// Get USDT to TWD
+	usdtToTWD, err := c.GetUsdtToTWD()
+	if err != nil {
+		return err
+	}
+	balanceTwd = balanceUsdt * usdtToTWD
+	fmt.Printf("Total balance: %10.2f USDT\n", balanceUsdt)
+	fmt.Printf("Total balance: %10.2f TWD\n", balanceTwd)
 	fmt.Printf("USDT to TWD: %.2f\n", usdtToTWD)
 
 	return nil
