@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math"
 
 	binanceModels "github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 	"github.com/dasbd72/go-exchange-sdk/max"
@@ -28,6 +29,44 @@ func (c *Client) GetOkxSymbolPrice(ctx context.Context, symbol string) (float64,
 		return 0, nil
 	}
 	return ticker.Tickers[0].Last.Float64(), nil
+}
+
+// GetOkxJumpstartBalance returns the balance of Jumpstart by the net flow from wallet to Jumpstart
+func (c *Client) GetOkxJumpstartBalance(ctx context.Context) (float64, error) {
+	balance := 0.0
+	// Get balance from Jumpstart, from wallet to Jumpstart, hence minus
+	outBills, err := c.okxClient.GetFundingBills(ctx, okxModels.NewGetFundingBillsRequest().Type("78"))
+	if err != nil {
+		return 0, err
+	}
+	for _, b := range outBills.Bills {
+		price := 1.0
+		if b.Ccy != "USDT" {
+			price, err = c.GetOkxSymbolPrice(ctx, b.Ccy+"-USDT")
+			if err != nil {
+				return 0, err
+			}
+		}
+		balance -= b.BalChg.Float64() * price
+	}
+	// Get balance from Jumpstart, from Jumpstart to wallet, hence minus
+	inBills, err := c.okxClient.GetFundingBills(ctx, okxModels.NewGetFundingBillsRequest().Type("124"))
+	if err != nil {
+		return 0, err
+	}
+	for _, b := range inBills.Bills {
+		price := 1.0
+		if b.Ccy != "USDT" {
+			price, err = c.GetOkxSymbolPrice(ctx, b.Ccy+"-USDT")
+			if err != nil {
+				return 0, err
+			}
+		}
+		balance -= b.BalChg.Float64() * price
+	}
+	balance = math.Max(balance, 0)
+	slog.Info(fmt.Sprintf("OKX Jumpstart balance: %f", balance))
+	return balance, nil
 }
 
 func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
@@ -115,6 +154,12 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			}
 			balance += s.Amt.Float64() * price
 		}
+		// Get balance from Jumpstart
+		jumpstartBalance, err := c.GetOkxJumpstartBalance(ctx)
+		if err != nil {
+			return 0, err
+		}
+		balance += jumpstartBalance
 		slog.Info(fmt.Sprintf("OKX balance: %f", balance))
 		return balance, nil
 	}
