@@ -3,6 +3,7 @@ package manager
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	binanceModels "github.com/dasbd72/go-exchange-sdk/binance/pkg/models"
 	"github.com/dasbd72/go-exchange-sdk/max"
@@ -44,7 +45,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			btcPrice := averagePrice.Price.Float64()
 
 			totalBalanceUsdt += sum * btcPrice
-			fmt.Println("Binance balance: ", sum*btcPrice)
+			slog.Info(fmt.Sprintf("Binance balance: %f", sum*btcPrice))
 			return nil
 		},
 		func() error {
@@ -66,6 +67,10 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 						if err != nil {
 							return err
 						}
+						if len(ticker.Tickers) == 0 {
+							slog.Warn(fmt.Sprintf("no ticker found for %s-USDT", detail.Ccy))
+							continue
+						}
 						price = ticker.Tickers[0].Last.Float64()
 					}
 					sum += detail.Eq.Float64() * price
@@ -82,6 +87,10 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 					ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(f.Ccy+"-USDT"))
 					if err != nil {
 						return err
+					}
+					if len(ticker.Tickers) == 0 {
+						slog.Warn(fmt.Sprintf("no ticker found for %s-USDT", f.Ccy))
+						continue
 					}
 					price = ticker.Tickers[0].Last.Float64()
 				}
@@ -104,7 +113,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				sum += s.Amt.Float64() * price
 			}
 			totalBalanceUsdt += sum
-			fmt.Println("OKX balance: ", sum)
+			slog.Info(fmt.Sprintf("OKX balance: %f", sum))
 			return nil
 		},
 		func() error {
@@ -125,7 +134,7 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			}
 
 			totalBalanceUsdt += sum
-			fmt.Println("Bitfinex balance: ", sum)
+			slog.Info(fmt.Sprintf("Bitfinex balance: %f", sum))
 			return nil
 		},
 		func() error {
