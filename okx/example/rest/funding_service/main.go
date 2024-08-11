@@ -29,4 +29,34 @@ func main() {
 		}
 		println(string(b))
 	}
+	{
+		// Get all billing records
+		req := models.NewGetFundingBillsRequest()
+		res, err := c.GetFundingBills(ctx, req)
+		if err != nil {
+			panic(err)
+		}
+		b, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		println(string(b))
+	}
+	{
+		// Get Jumpstart billing records
+		types := []string{"78", "124"}
+		for _, t := range types {
+			println("Type:", t)
+			req := models.NewGetFundingBillsRequest().Type(t)
+			res, err := c.GetFundingBills(ctx, req)
+			if err != nil {
+				panic(err)
+			}
+			b, err := json.MarshalIndent(res, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+			println(string(b))
+		}
+	}
 }
