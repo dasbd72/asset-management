@@ -17,6 +17,19 @@ type (
 	}
 )
 
+// GetOkxSymbolPrice returns the price of the symbol in USDT
+func (c *Client) GetOkxSymbolPrice(ctx context.Context, symbol string) (float64, error) {
+	ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(symbol))
+	if err != nil {
+		return 0, err
+	}
+	if len(ticker.Tickers) == 0 {
+		slog.Warn(fmt.Sprintf("no ticker found for %s", symbol))
+		return 0, nil
+	}
+	return ticker.Tickers[0].Last.Float64(), nil
+}
+
 func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 	var (
 		totalBalanceUsdt float64
@@ -63,15 +76,10 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 				for _, detail := range w.Details {
 					price := 1.0
 					if detail.Ccy != "USDT" {
-						ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(detail.Ccy+"-USDT"))
+						price, err = c.GetOkxSymbolPrice(ctx, detail.Ccy+"-USDT")
 						if err != nil {
 							return err
 						}
-						if len(ticker.Tickers) == 0 {
-							slog.Warn(fmt.Sprintf("no ticker found for %s-USDT", detail.Ccy))
-							continue
-						}
-						price = ticker.Tickers[0].Last.Float64()
 					}
 					sum += detail.Eq.Float64() * price
 				}
@@ -84,15 +92,10 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			for _, f := range funding.Balances {
 				price := 1.0
 				if f.Ccy != "USDT" {
-					ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(f.Ccy+"-USDT"))
+					price, err = c.GetOkxSymbolPrice(ctx, f.Ccy+"-USDT")
 					if err != nil {
 						return err
 					}
-					if len(ticker.Tickers) == 0 {
-						slog.Warn(fmt.Sprintf("no ticker found for %s-USDT", f.Ccy))
-						continue
-					}
-					price = ticker.Tickers[0].Last.Float64()
 				}
 				sum += f.Bal.Float64() * price
 			}
@@ -104,11 +107,10 @@ func (c *Client) GetBalance(ctx context.Context) (*Balance, error) {
 			for _, s := range savings.Balances {
 				price := 1.0
 				if s.Ccy != "USDT" {
-					ticker, err := c.okxClient.GetTicker(ctx, okxModels.NewGetTickerRequest(s.Ccy+"-USDT"))
+					price, err = c.GetOkxSymbolPrice(ctx, s.Ccy+"-USDT")
 					if err != nil {
 						return err
 					}
-					price = ticker.Tickers[0].Last.Float64()
 				}
 				sum += s.Amt.Float64() * price
 			}
